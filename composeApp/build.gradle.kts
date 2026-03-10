@@ -56,11 +56,20 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.material.icons.extended)
+
+            implementation(libs.navigation.compose)
+
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network)
+
             // Added
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.contentNegotiation)
             implementation(libs.ktor.serialization.json)
             implementation(libs.kotlinx.serialization.json)
+
+            implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
