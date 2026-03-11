@@ -3,7 +3,10 @@ package com.revive.coinpulse.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revive.coinpulse.data.model.Coin
-import com.revive.coinpulse.domain.repository.CoinRepository
+import com.revive.coinpulse.domain.usecase.GetCachedCoinsUseCase
+import com.revive.coinpulse.domain.usecase.GetCoinsUseCase
+import com.revive.coinpulse.domain.usecase.ObserveFavoritesUseCase
+import com.revive.coinpulse.domain.usecase.ToggleFavoriteUseCase
 import com.revive.coinpulse.getCurrentTime
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,7 +31,10 @@ data class CoinUiState(
 }
 
 class CoinViewModel(
-    private val repository: CoinRepository
+    private val getCoinsUseCase: GetCoinsUseCase,
+    private val getCachedCoinsUseCase: GetCachedCoinsUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val observeFavoritesUseCase: ObserveFavoritesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CoinUiState())
@@ -37,11 +43,6 @@ class CoinViewModel(
     private var pollingJob: Job? = null
     private var cooldownJob: Job? = null
 
-    companion object {
-        const val POLLING_INTERVAL_MS = 60_000L
-        const val COOLDOWN_MS = 60_000L
-    }
-
     init {
         loadCache()
         startPolling()
@@ -49,11 +50,29 @@ class CoinViewModel(
     }
 
     private fun loadCache() {
-        if (repository.hasCachedData()) {
+        if (getCachedCoinsUseCase.hasCachedData()) {
             _uiState.value = _uiState.value.copy(
-                coins = repository.loadCachedCoins(),
-                lastUpdated = repository.getCacheTime()
+                coins = getCachedCoinsUseCase(),
+                lastUpdated = getCachedCoinsUseCase.getCacheTime()
             )
+        }
+    }
+
+    private fun startPolling() {
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
+            while (true) {
+                getCoins()
+                delay(60_000)
+            }
+        }
+    }
+
+    private fun observeFavorites() {
+        viewModelScope.launch {
+            observeFavoritesUseCase().collect { favorites ->
+                _uiState.value = _uiState.value.copy(favorites = favorites)
+            }
         }
     }
 
@@ -63,7 +82,7 @@ class CoinViewModel(
             errorMessage = null
         )
 
-        repository.getCoins().fold(
+        getCoinsUseCase().fold(
             onSuccess = { coins ->
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
@@ -74,7 +93,7 @@ class CoinViewModel(
             onFailure = { error ->
                 val hasCachedData = _uiState.value.coins.isNotEmpty()
                 val message = when {
-                    hasCachedData -> null // 캐시 데이터가 있으면 에러 표시 안함
+                    hasCachedData -> null
                     error.message?.contains("429") == true -> "Rate limit exceeded. Please wait a moment."
                     error.message?.contains("Rate Limit") == true -> "Rate limit exceeded. Please wait a moment."
                     else -> error.message ?: "Unknown error"
@@ -87,6 +106,20 @@ class CoinViewModel(
         )
     }
 
+    fun refresh() {
+        if (!_uiState.value.isRefreshEnabled) return
+        _uiState.value = _uiState.value.copy(isRefreshEnabled = false)
+
+        cooldownJob?.cancel()
+        cooldownJob = viewModelScope.launch {
+            startPolling()
+            delay(60_000)
+            _uiState.value = _uiState.value.copy(isRefreshEnabled = true)
+        }
+    }
+
+    fun toggleFavorite(coinId: String) = toggleFavoriteUseCase(coinId)
+
     fun onSearchQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
     }
@@ -98,51 +131,9 @@ class CoinViewModel(
         )
     }
 
-    private fun observeFavorites() {
-        viewModelScope.launch {
-            repository.favoritesFlow.collect { favorites ->
-                _uiState.value = _uiState.value.copy(favorites = favorites)
-            }
-        }
-    }
-
-    fun toggleFavorite(coinId: String) {
-        repository.toggleFavorite(coinId)
-    }
-
-    fun startPolling() {
-        pollingJob?.cancel()
-        pollingJob = viewModelScope.launch {
-            while (true) {
-                getCoins()
-                delay(POLLING_INTERVAL_MS)
-            }
-        }
-    }
-
-    fun stopPolling() {
-        pollingJob?.cancel()
-    }
-
-    fun refresh() {
-        if (!_uiState.value.isRefreshEnabled) return
-        pollingJob?.cancel()
-        startCooldown()
-        startPolling()
-    }
-
-    private fun startCooldown() {
-        cooldownJob?.cancel()
-        _uiState.value = _uiState.value.copy(isRefreshEnabled = false)
-        cooldownJob = viewModelScope.launch {
-            delay(COOLDOWN_MS)
-            _uiState.value = _uiState.value.copy(isRefreshEnabled = true)
-        }
-    }
-
     override fun onCleared() {
         super.onCleared()
-        stopPolling()
+        pollingJob?.cancel()
         cooldownJob?.cancel()
     }
 }

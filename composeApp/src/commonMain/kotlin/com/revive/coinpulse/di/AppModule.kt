@@ -7,6 +7,10 @@ import com.revive.coinpulse.data.createSettings
 import com.revive.coinpulse.data.remote.CoinRemoteDataSource
 import com.revive.coinpulse.data.remote.createHttpClient
 import com.revive.coinpulse.domain.repository.CoinRepository
+import com.revive.coinpulse.domain.usecase.GetCachedCoinsUseCase
+import com.revive.coinpulse.domain.usecase.GetCoinsUseCase
+import com.revive.coinpulse.domain.usecase.ObserveFavoritesUseCase
+import com.revive.coinpulse.domain.usecase.ToggleFavoriteUseCase
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -24,6 +28,12 @@ val appModule = module {
     // Repository
     single<CoinRepository> { CoinRepositoryImpl(get(), get(), get()) }
 
+    // Use Cases
+    single { GetCoinsUseCase(get()) }
+    single { GetCachedCoinsUseCase(get()) }
+    single { ToggleFavoriteUseCase(get()) }
+    single { ObserveFavoritesUseCase(get()) }
+
     // ViewModel
-    viewModel { CoinViewModel(get()) }
+    viewModel { CoinViewModel(get(), get(), get(), get()) }
 }
