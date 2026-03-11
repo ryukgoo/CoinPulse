@@ -16,4 +16,5 @@ interface CoinRepository {
     fun loadCachedCoins(): List<Coin>
     fun hasCachedData(): Boolean
     fun getCacheTime(): String
+    fun clearCache()
 }

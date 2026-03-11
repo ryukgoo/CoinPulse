@@ -1,5 +1,6 @@
 package com.revive.coinpulse.di
 
+import com.revive.coinpulse.data.AppSettings
 import com.revive.coinpulse.data.CoinCacheStorage
 import com.revive.coinpulse.data.CoinRepositoryImpl
 import com.revive.coinpulse.data.FavoriteStorage
@@ -28,12 +29,20 @@ val appModule = module {
     // Repository
     single<CoinRepository> { CoinRepositoryImpl(get(), get(), get()) }
 
+
     // Use Cases
     single { GetCoinsUseCase(get()) }
     single { GetCachedCoinsUseCase(get()) }
     single { ToggleFavoriteUseCase(get()) }
     single { ObserveFavoritesUseCase(get()) }
 
+    // Storage
+    single { createSettings() }
+    single { FavoriteStorage(get()) }
+    single { CoinCacheStorage(get()) }
+    single { AppSettings(get()) }
+
     // ViewModel
-    viewModel { CoinViewModel(get(), get(), get(), get()) }
+    viewModel { CoinViewModel(get(), get(), get(), get(), get()) }
 }
+

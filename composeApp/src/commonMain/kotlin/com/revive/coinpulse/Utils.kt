@@ -19,7 +19,17 @@ fun formatEpochMs(epochMs: Long): String {
     return "${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}:${local.second.toString().padStart(2, '0')}"
 }
 
-fun Double.toFormattedPrice(): String {
+fun currencySymbol(currency: String): String = when (currency.lowercase()) {
+    "usd" -> "$"
+    "krw" -> "₩"
+    "eur" -> "€"
+    "jpy" -> "¥"
+    "btc" -> "₿"
+    else -> "$"
+}
+
+fun Double.toFormattedPrice(currency: String = "usd"): String {
+    val symbol = currencySymbol(currency)
     val long = this.toLong()
     val decimal = ((this - long) * 100).roundToInt()
     val decimalStr = decimal.toString().padStart(2, '0')
@@ -32,7 +42,7 @@ fun Double.toFormattedPrice(): String {
         }
     }.reversed()
 
-    return "$$withComma.$decimalStr"
+    return "$symbol$withComma.$decimalStr"
 }
 
 fun Double.toFormattedPercent(): String {

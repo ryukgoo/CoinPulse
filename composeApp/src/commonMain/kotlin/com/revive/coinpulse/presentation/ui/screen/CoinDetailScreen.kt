@@ -151,7 +151,7 @@ fun CoinDetailContent(
             ) {
                 DetailRow(label = "Market Cap", value = coin.marketCap.toFormattedPrice())
                 HorizontalDivider(color = CoinPulseColors.Background)
-                DetailRow(label = "24h Volume", value = coin.totalVolume.toFormattedPrice())
+                DetailRow(label = "24h Volume", value = (coin.totalVolume ?: 0.0).toFormattedPrice())
                 HorizontalDivider(color = CoinPulseColors.Background)
                 DetailRow(label = "24h High", value = coin.high24h?.toFormattedPrice() ?: "-")
                 HorizontalDivider(color = CoinPulseColors.Background)

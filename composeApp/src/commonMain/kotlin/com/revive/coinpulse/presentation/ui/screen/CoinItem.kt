@@ -33,6 +33,7 @@ import com.revive.coinpulse.toFormattedPrice
 fun CoinItem(
     coin: Coin,
     isFavorite: Boolean,
+    currency: String = "usd",
     onCoinClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
@@ -78,7 +79,7 @@ fun CoinItem(
         ) {
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = coin.currentPrice.toFormattedPrice(),
+                    text = coin.currentPrice.toFormattedPrice(currency),
                     color = CoinPulseColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp

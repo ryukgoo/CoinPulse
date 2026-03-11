@@ -35,4 +35,5 @@ class CoinRepositoryImpl(
     override fun loadCachedCoins(): List<Coin> = cacheStorage.loadCoins()
     override fun hasCachedData(): Boolean = cacheStorage.hasCachedData()
     override fun getCacheTime(): String = cacheStorage.getCacheTime()
+    override fun clearCache() = cacheStorage.clearCache()
 }

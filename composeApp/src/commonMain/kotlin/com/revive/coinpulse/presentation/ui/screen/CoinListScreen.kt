@@ -21,6 +21,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -29,8 +34,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,15 +58,40 @@ fun CoinListScreen(
     onCoinClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    CoinListContent(
-        uiState = uiState,
-        onCoinClick = onCoinClick,
-        onFavoriteClick = { viewModel.toggleFavorite(it) },
-        onRefresh = { viewModel.refresh() },
-        onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
-        onSearchActiveChange = { viewModel.onSearchActiveChange(it) }
-    )
+    LaunchedEffect(uiState.snackbarMessage) {
+        uiState.snackbarMessage?.let {
+            snackbarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Short
+            )
+            viewModel.onSnackbarDismissed()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = CoinPulseColors.Surface,
+                    contentColor = CoinPulseColors.TextPrimary
+                )
+            }
+        },
+        containerColor = CoinPulseColors.Background
+    ) { innerPadding ->
+        CoinListContent(
+            uiState = uiState,
+            onCoinClick = onCoinClick,
+            onFavoriteClick = { viewModel.toggleFavorite(it) },
+            onRefresh = { viewModel.refresh() },
+            onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+            onSearchActiveChange = { viewModel.onSearchActiveChange(it) },
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,12 +102,13 @@ fun CoinListContent(
     onFavoriteClick: (String) -> Unit,
     onRefresh: () -> Unit,
     onSearchQueryChange: (String) -> Unit,
-    onSearchActiveChange: (Boolean) -> Unit
+    onSearchActiveChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(CoinPulseColors.Background)
     ) {
@@ -210,6 +243,7 @@ fun CoinListContent(
                         CoinLazyList(
                             coins = uiState.filteredCoins,
                             favorites = uiState.favorites,
+                            currency = uiState.currency,
                             showSummaryCard = !uiState.isSearchActive,
                             onCoinClick = onCoinClick,
                             onFavoriteClick = onFavoriteClick
@@ -219,6 +253,7 @@ fun CoinListContent(
                     CoinLazyList(
                         coins = uiState.filteredCoins,
                         favorites = uiState.favorites,
+                        currency = uiState.currency,
                         showSummaryCard = !uiState.isSearchActive,
                         onCoinClick = onCoinClick,
                         onFavoriteClick = onFavoriteClick
@@ -233,6 +268,7 @@ fun CoinListContent(
 private fun CoinLazyList(
     coins: List<Coin>,
     favorites: Set<String>,
+    currency: String,
     showSummaryCard: Boolean,
     onCoinClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit
@@ -254,6 +290,7 @@ private fun CoinLazyList(
                 CoinItem(
                     coin = coin,
                     isFavorite = favorites.contains(coin.id),
+                    currency = currency,
                     onCoinClick = { onCoinClick(coin.id) },
                     onFavoriteClick = { onFavoriteClick(coin.id) }
                 )

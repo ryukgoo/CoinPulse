@@ -7,4 +7,5 @@ class GetCachedCoinsUseCase(private val repository: CoinRepository) {
     operator fun invoke(): List<Coin> = repository.loadCachedCoins()
     fun hasCachedData(): Boolean = repository.hasCachedData()
     fun getCacheTime(): String = repository.getCacheTime()
+    fun clearCache() = repository.clearCache()
 }

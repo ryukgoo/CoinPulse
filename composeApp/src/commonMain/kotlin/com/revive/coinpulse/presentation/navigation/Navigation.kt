@@ -19,6 +19,7 @@ import androidx.navigation.toRoute
 import com.revive.coinpulse.presentation.ui.screen.CoinDetailScreen
 import com.revive.coinpulse.presentation.ui.screen.CoinFavoriteScreen
 import com.revive.coinpulse.presentation.ui.screen.CoinListScreen
+import com.revive.coinpulse.presentation.ui.screen.SettingsScreen
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import kotlinx.serialization.Serializable
@@ -32,7 +33,6 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val viewModel = koinViewModel<CoinViewModel>()
 
-    val bottomNavItems = listOf(BottomNavItem.Home, BottomNavItem.Favorites)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showBottomBar = currentRoute?.contains("CoinDetailRoute") == false
@@ -40,10 +40,8 @@ fun AppNavigation() {
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar(
-                    containerColor = CoinPulseColors.Surface
-                ) {
-                    bottomNavItems.forEach { item ->
+                NavigationBar(containerColor = CoinPulseColors.Surface) {
+                    BottomNavItem.entries.forEach { item ->
                         NavigationBarItem(
                             selected = currentRoute?.contains(item.route) == true,
                             onClick = {
@@ -103,6 +101,9 @@ fun AppNavigation() {
                     coin = coin,
                     onBackClick = { navController.popBackStack() }
                 )
+            }
+            composable(BottomNavItem.Settings.route) {
+                SettingsScreen(viewModel = viewModel)
             }
         }
     }

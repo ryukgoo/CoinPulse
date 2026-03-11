@@ -26,6 +26,11 @@ class CoinCacheStorage(private val settings: Settings) {
         else json.decodeFromString(raw)
     }
 
+    fun clearCache() {
+        settings.remove(KEY_COIN_CACHE)
+        settings.remove(KEY_CACHE_TIME)
+    }
+
     fun hasCachedData(): Boolean {
         return settings.getString(KEY_COIN_CACHE, "").isNotEmpty()
     }
