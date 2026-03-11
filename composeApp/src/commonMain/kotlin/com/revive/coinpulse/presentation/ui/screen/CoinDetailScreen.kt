@@ -33,12 +33,24 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.revive.coinpulse.data.model.Coin
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
+import com.revive.coinpulse.presentation.ui.theme.CoinPulseTheme
 import com.revive.coinpulse.toFormattedPercent
 import com.revive.coinpulse.toFormattedPrice
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinDetailScreen(
+    coin: Coin,
+    onBackClick: () -> Unit
+) {
+    CoinDetailContent(
+        coin = coin,
+        onBackClick = onBackClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CoinDetailContent(
     coin: Coin,
     onBackClick: () -> Unit
 ) {
@@ -79,7 +91,6 @@ fun CoinDetailScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -114,7 +125,6 @@ fun CoinDetailScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Price
             Column {
                 Text(
                     text = coin.currentPrice.toFormattedPrice(),
@@ -131,7 +141,6 @@ fun CoinDetailScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Stats Card
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -173,23 +182,71 @@ private fun DetailRow(label: String, value: String) {
     }
 }
 
-@Preview
+@Preview(showBackground = true, name = "CoinDetail - Price Up")
 @Composable
-fun CoinDetailScreenPreview() {
-    CoinDetailScreen(
-        coin = Coin(
-            id = "bitcoin",
-            symbol = "btc",
-            name = "Bitcoin",
-            currentPrice = 70000.0,
-            priceChangePercentage24h = 4.61,
-            marketCap = 1380000000000.0,
-            totalVolume = 28000000000.0,
-            imageUrl = "",
-            marketCapRank = 1,
-            high24h = 71000.0,
-            low24h = 69000.0
-        ),
-        onBackClick = {}
-    )
+fun CoinDetailContentUpPreview() {
+    CoinPulseTheme {
+        CoinDetailContent(
+            coin = Coin(
+                id = "bitcoin",
+                symbol = "btc",
+                name = "Bitcoin",
+                currentPrice = 70000.0,
+                priceChangePercentage24h = 4.61,
+                marketCap = 1380000000000.0,
+                totalVolume = 28000000000.0,
+                imageUrl = "",
+                marketCapRank = 1,
+                high24h = 71000.0,
+                low24h = 69000.0
+            ),
+            onBackClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "CoinDetail - Price Down")
+@Composable
+fun CoinDetailContentDownPreview() {
+    CoinPulseTheme {
+        CoinDetailContent(
+            coin = Coin(
+                id = "ethereum",
+                symbol = "eth",
+                name = "Ethereum",
+                currentPrice = 2066.49,
+                priceChangePercentage24h = -3.40,
+                marketCap = 248000000000.0,
+                totalVolume = 12000000000.0,
+                imageUrl = "",
+                marketCapRank = 2,
+                high24h = 2100.0,
+                low24h = 2000.0
+            ),
+            onBackClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "CoinDetail - Null Fields")
+@Composable
+fun CoinDetailContentNullPreview() {
+    CoinPulseTheme {
+        CoinDetailContent(
+            coin = Coin(
+                id = "unknown",
+                symbol = "unk",
+                name = "Unknown Coin",
+                currentPrice = 0.0,
+                priceChangePercentage24h = null,
+                marketCap = 0.0,
+                totalVolume = 0.0,
+                imageUrl = "",
+                marketCapRank = null,
+                high24h = null,
+                low24h = null
+            ),
+            onBackClick = {}
+        )
+    }
 }

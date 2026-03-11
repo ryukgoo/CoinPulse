@@ -9,11 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,17 +30,20 @@ import com.revive.coinpulse.toFormattedPercent
 import com.revive.coinpulse.toFormattedPrice
 
 @Composable
-fun CoinItem(coin: Coin, onCoinClick: () -> Unit) {
-    val priceChange = coin.priceChangePercentage24h ?: 0.0
-    val priceChangeColor = if (priceChange >= 0)
-        CoinPulseColors.PriceUp else CoinPulseColors.PriceDown
+fun CoinItem(
+    coin: Coin,
+    isFavorite: Boolean,
+    onCoinClick: () -> Unit,
+    onFavoriteClick: () -> Unit
+) {
+    val favoriteColor = if (isFavorite) Color(0xFFFFD700) else CoinPulseColors.TextSecondary
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onCoinClick() }
             .background(CoinPulseColors.Surface)
+            .clickable { onCoinClick() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -63,18 +72,33 @@ fun CoinItem(coin: Coin, onCoinClick: () -> Unit) {
             }
         }
 
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = coin.currentPrice.toFormattedPrice(),
-                color = CoinPulseColors.TextPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
-            Text(
-                text = priceChange.toFormattedPercent(),
-                color = priceChangeColor,
-                fontSize = 12.sp
-            )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = coin.currentPrice.toFormattedPrice(),
+                    color = CoinPulseColors.TextPrimary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                val priceChange = coin.priceChangePercentage24h ?: 0.0
+                val priceChangeColor = if (priceChange >= 0)
+                    CoinPulseColors.PriceUp else CoinPulseColors.PriceDown
+                Text(
+                    text = priceChange.toFormattedPercent(),
+                    color = priceChangeColor,
+                    fontSize = 12.sp
+                )
+            }
+            IconButton(onClick = onFavoriteClick) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
+                    contentDescription = "Favorite",
+                    tint = favoriteColor
+                )
+            }
         }
     }
 }

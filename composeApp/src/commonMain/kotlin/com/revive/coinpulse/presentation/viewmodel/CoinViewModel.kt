@@ -17,7 +17,8 @@ data class CoinUiState(
     val coins: List<Coin> = emptyList(),
     val errorMessage: String? = null,
     val lastUpdated: String = "",
-    val isRefreshEnabled: Boolean = true
+    val isRefreshEnabled: Boolean = true,
+    val favorites: Set<String> = emptySet()
 )
 
 class CoinViewModel(
@@ -36,7 +37,60 @@ class CoinViewModel(
     }
 
     init {
+        loadCache()
         startPolling()
+        observeFavorites()
+    }
+
+    private fun loadCache() {
+        if (repository.hasCachedData()) {
+            _uiState.value = _uiState.value.copy(
+                coins = repository.loadCachedCoins(),
+                lastUpdated = repository.getCacheTime()
+            )
+        }
+    }
+
+    private suspend fun getCoins() {
+        _uiState.value = _uiState.value.copy(
+            isLoading = _uiState.value.coins.isEmpty(),
+            errorMessage = null
+        )
+
+        repository.getCoins().fold(
+            onSuccess = { coins ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    coins = coins,
+                    lastUpdated = getCurrentTime()
+                )
+            },
+            onFailure = { error ->
+                val hasCachedData = _uiState.value.coins.isNotEmpty()
+                val message = when {
+                    hasCachedData -> null // 캐시 데이터가 있으면 에러 표시 안함
+                    error.message?.contains("429") == true -> "Rate limit exceeded. Please wait a moment."
+                    error.message?.contains("Rate Limit") == true -> "Rate limit exceeded. Please wait a moment."
+                    else -> error.message ?: "Unknown error"
+                }
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = message
+                )
+            }
+        )
+    }
+
+    private fun observeFavorites() {
+        viewModelScope.launch {
+            repository.favoritesFlow.collect { favorites ->
+                _uiState.value = _uiState.value.copy(favorites = favorites)
+            }
+        }
+    }
+
+    fun toggleFavorite(coinId: String) {
+        repository.toggleFavorite(coinId)
     }
 
     fun startPolling() {
@@ -67,34 +121,6 @@ class CoinViewModel(
             delay(COOLDOWN_MS)
             _uiState.value = _uiState.value.copy(isRefreshEnabled = true)
         }
-    }
-
-    private suspend fun getCoins() {
-        _uiState.value = _uiState.value.copy(
-            isLoading = _uiState.value.coins.isEmpty(),
-            errorMessage = null
-        )
-
-        repository.getCoins().fold(
-            onSuccess = { coins ->
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    coins = coins,
-                    lastUpdated = getCurrentTime()
-                )
-            },
-            onFailure = { error ->
-                val message = when {
-                    error.message?.contains("429") == true -> "Rate limit exceeded. Please wait a moment."
-                    error.message?.contains("Rate Limit") == true -> "Rate limit exceeded. Please wait a moment."
-                    else -> error.message ?: "Unknown error"
-                }
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    errorMessage = message
-                )
-            }
-        )
     }
 
     override fun onCleared() {

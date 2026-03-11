@@ -3,11 +3,12 @@ package com.revive.coinpulse.presentation.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,30 +26,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.revive.coinpulse.data.model.Coin
 import com.revive.coinpulse.isMobile
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
+import com.revive.coinpulse.presentation.ui.theme.CoinPulseTheme
+import com.revive.coinpulse.presentation.viewmodel.CoinUiState
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinListScreen(
     viewModel: CoinViewModel,
     onCoinClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    CoinListContent(
+        uiState = uiState,
+        onCoinClick = onCoinClick,
+        onFavoriteClick = { viewModel.toggleFavorite(it) },
+        onRefresh = { viewModel.refresh() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CoinListContent(
+    uiState: CoinUiState,
+    onCoinClick: (String) -> Unit,
+    onFavoriteClick: (String) -> Unit,
+    onRefresh: () -> Unit
+) {
     val pullToRefreshState = rememberPullToRefreshState()
 
-    Column(
+    androidx.compose.foundation.layout.Column(
         modifier = Modifier
             .fillMaxSize()
             .background(CoinPulseColors.Background)
     ) {
         TopAppBar(
             title = {
-                Column {
+                androidx.compose.foundation.layout.Column {
                     Text(
                         text = "CoinPulse",
                         color = CoinPulseColors.TextPrimary,
@@ -66,7 +86,7 @@ fun CoinListScreen(
             },
             actions = {
                 IconButton(
-                    onClick = { viewModel.refresh() },
+                    onClick = onRefresh,
                     enabled = uiState.isRefreshEnabled
                 ) {
                     Icon(
@@ -99,7 +119,7 @@ fun CoinListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = uiState.errorMessage!!,
+                        text = uiState.errorMessage,
                         color = CoinPulseColors.PriceDown
                     )
                 }
@@ -108,19 +128,23 @@ fun CoinListScreen(
                 if (isMobile) {
                     PullToRefreshBox(
                         isRefreshing = uiState.isLoading,
-                        onRefresh = { viewModel.refresh() },
+                        onRefresh = onRefresh,
                         state = pullToRefreshState,
                         modifier = Modifier.fillMaxSize()
                     ) {
                         CoinLazyList(
                             coins = uiState.coins,
-                            onCoinClick = onCoinClick
+                            favorites = uiState.favorites,
+                            onCoinClick = onCoinClick,
+                            onFavoriteClick = onFavoriteClick
                         )
                     }
                 } else {
                     CoinLazyList(
                         coins = uiState.coins,
-                        onCoinClick = onCoinClick
+                        favorites = uiState.favorites,
+                        onCoinClick = onCoinClick,
+                        onFavoriteClick = onFavoriteClick
                     )
                 }
             }
@@ -131,20 +155,108 @@ fun CoinListScreen(
 @Composable
 private fun CoinLazyList(
     coins: List<Coin>,
-    onCoinClick: (String) -> Unit
+    favorites: Set<String>,
+    onCoinClick: (String) -> Unit,
+    onFavoriteClick: (String) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item { SummaryCard(coins = coins) }
-        items(coins) { coin ->
-            CoinItem(
-                coin = coin,
-                onCoinClick = { onCoinClick(coin.id) }
-            )
+    val listState = rememberLazyListState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item { SummaryCard(coins = coins) }
+            items(coins) { coin ->
+                CoinItem(
+                    coin = coin,
+                    isFavorite = favorites.contains(coin.id),
+                    onCoinClick = { onCoinClick(coin.id) },
+                    onFavoriteClick = { onFavoriteClick(coin.id) }
+                )
+            }
         }
+        CoinScrollbar(
+            listState = listState,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxHeight()
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "CoinList - Data")
+@Composable
+fun CoinListContentDataPreview() {
+    val dummyCoins = listOf(
+        Coin(
+            id = "bitcoin",
+            symbol = "btc",
+            name = "Bitcoin",
+            currentPrice = 70000.0,
+            priceChangePercentage24h = 4.61,
+            marketCap = 1380000000000.0,
+            totalVolume = 28000000000.0,
+            imageUrl = "",
+            marketCapRank = 1,
+            high24h = 71000.0,
+            low24h = 69000.0
+        ),
+        Coin(
+            id = "ethereum",
+            symbol = "eth",
+            name = "Ethereum",
+            currentPrice = 2066.49,
+            priceChangePercentage24h = -3.40,
+            marketCap = 248000000000.0,
+            totalVolume = 12000000000.0,
+            imageUrl = "",
+            marketCapRank = 2,
+            high24h = 2100.0,
+            low24h = 2000.0
+        )
+    )
+
+    CoinPulseTheme {
+        CoinListContent(
+            uiState = CoinUiState(
+                coins = dummyCoins,
+                favorites = setOf("bitcoin"),
+                lastUpdated = "15:00:00",
+                isRefreshEnabled = true
+            ),
+            onCoinClick = {},
+            onFavoriteClick = {},
+            onRefresh = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "CoinList - Loading")
+@Composable
+fun CoinListContentLoadingPreview() {
+    CoinPulseTheme {
+        CoinListContent(
+            uiState = CoinUiState(isLoading = true),
+            onCoinClick = {},
+            onFavoriteClick = {},
+            onRefresh = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "CoinList - Error")
+@Composable
+fun CoinListContentErrorPreview() {
+    CoinPulseTheme {
+        CoinListContent(
+            uiState = CoinUiState(errorMessage = "Rate limit exceeded. Please wait a moment."),
+            onCoinClick = {},
+            onFavoriteClick = {},
+            onRefresh = {}
+        )
     }
 }

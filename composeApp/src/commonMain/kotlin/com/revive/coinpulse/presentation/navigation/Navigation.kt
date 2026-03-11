@@ -1,20 +1,34 @@
 package com.revive.coinpulse.presentation.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.revive.coinpulse.data.CoinCacheStorage
 import com.revive.coinpulse.data.CoinRepositoryImpl
+import com.revive.coinpulse.data.FavoriteStorage
+import com.revive.coinpulse.data.createSettings
 import com.revive.coinpulse.data.remote.CoinRemoteDataSource
 import com.revive.coinpulse.data.remote.createHttpClient
 import com.revive.coinpulse.presentation.ui.screen.CoinDetailScreen
+import com.revive.coinpulse.presentation.ui.screen.CoinFavoriteScreen
 import com.revive.coinpulse.presentation.ui.screen.CoinListScreen
+import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import kotlinx.serialization.Serializable
-
-@Serializable
-object CoinListRoute
 
 @Serializable
 data class CoinDetailRoute(val coinId: String)
@@ -23,30 +37,87 @@ data class CoinDetailRoute(val coinId: String)
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    val httpClient = createHttpClient()
-    val remoteDataSource = CoinRemoteDataSource(httpClient)
-    val repository = CoinRepositoryImpl(remoteDataSource)
-    val viewModel = CoinViewModel(repository)
+    val viewModel = remember {
+        val httpClient = createHttpClient()
+        val remoteDataSource = CoinRemoteDataSource(httpClient)
+        val favoriteStorage = FavoriteStorage(createSettings())
+        val cacheStorage = CoinCacheStorage(createSettings())
+        val repository = CoinRepositoryImpl(remoteDataSource, favoriteStorage, cacheStorage)
+        CoinViewModel(repository)
+    }
 
-    NavHost(
-        navController = navController,
-        startDestination = CoinListRoute
-    ) {
-        composable<CoinListRoute> {
-            CoinListScreen(
-                viewModel = viewModel,
-                onCoinClick = { coinId ->
-                    navController.navigate(CoinDetailRoute(coinId))
+    val bottomNavItems = listOf(BottomNavItem.Home, BottomNavItem.Favorites)
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val showBottomBar = currentRoute?.contains("CoinDetailRoute") == false
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = CoinPulseColors.Surface
+                ) {
+                    bottomNavItems.forEach { item ->
+                        NavigationBarItem(
+                            selected = currentRoute.contains(item.route),
+                            onClick = {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label
+                                )
+                            },
+                            label = { Text(text = item.label) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = CoinPulseColors.Primary,
+                                selectedTextColor = CoinPulseColors.Primary,
+                                unselectedIconColor = CoinPulseColors.TextSecondary,
+                                unselectedTextColor = CoinPulseColors.TextSecondary,
+                                indicatorColor = CoinPulseColors.Background
+                            )
+                        )
+                    }
                 }
-            )
+            }
         }
-        composable<CoinDetailRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<CoinDetailRoute>()
-            val coin = viewModel.uiState.value.coins.find { it.id == route.coinId } ?: return@composable
-            CoinDetailScreen(
-                coin = coin,
-                onBackClick = { navController.popBackStack() }
-            )
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = BottomNavItem.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(BottomNavItem.Home.route) {
+                CoinListScreen(
+                    viewModel = viewModel,
+                    onCoinClick = { coinId ->
+                        navController.navigate(CoinDetailRoute(coinId))
+                    }
+                )
+            }
+            composable(BottomNavItem.Favorites.route) {
+                CoinFavoriteScreen(
+                    viewModel = viewModel,
+                    onCoinClick = { coinId ->
+                        navController.navigate(CoinDetailRoute(coinId))
+                    }
+                )
+            }
+            composable<CoinDetailRoute> { backStackEntry ->
+                val route = backStackEntry.toRoute<CoinDetailRoute>()
+                val coin = viewModel.uiState.value.coins.find { it.id == route.coinId } ?: return@composable
+                CoinDetailScreen(
+                    coin = coin,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
         }
     }
 }
