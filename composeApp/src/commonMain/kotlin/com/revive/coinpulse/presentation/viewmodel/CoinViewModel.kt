@@ -18,8 +18,14 @@ data class CoinUiState(
     val errorMessage: String? = null,
     val lastUpdated: String = "",
     val isRefreshEnabled: Boolean = true,
-    val favorites: Set<String> = emptySet()
-)
+    val favorites: Set<String> = emptySet(),
+    val searchQuery: String = "",
+    val isSearchActive: Boolean = false
+) {
+    val filteredCoins: List<Coin>
+        get() = if (searchQuery.isEmpty()) coins
+        else coins.filter { it.name.contains(searchQuery, ignoreCase = true) }
+}
 
 class CoinViewModel(
     private val repository: CoinRepository
@@ -78,6 +84,17 @@ class CoinViewModel(
                     errorMessage = message
                 )
             }
+        )
+    }
+
+    fun onSearchQueryChange(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+    }
+
+    fun onSearchActiveChange(isActive: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            isSearchActive = isActive,
+            searchQuery = if (!isActive) "" else _uiState.value.searchQuery
         )
     }
 

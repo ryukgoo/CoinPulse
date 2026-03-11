@@ -3,19 +3,27 @@ package com.revive.coinpulse.presentation.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -25,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,7 +56,9 @@ fun CoinListScreen(
         uiState = uiState,
         onCoinClick = onCoinClick,
         onFavoriteClick = { viewModel.toggleFavorite(it) },
-        onRefresh = { viewModel.refresh() }
+        onRefresh = { viewModel.refresh() },
+        onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+        onSearchActiveChange = { viewModel.onSearchActiveChange(it) }
     )
 }
 
@@ -57,52 +68,116 @@ fun CoinListContent(
     uiState: CoinUiState,
     onCoinClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onSearchActiveChange: (Boolean) -> Unit
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
 
-    androidx.compose.foundation.layout.Column(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(CoinPulseColors.Background)
     ) {
-        TopAppBar(
-            title = {
-                androidx.compose.foundation.layout.Column {
-                    Text(
-                        text = "CoinPulse",
-                        color = CoinPulseColors.TextPrimary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp
+        if (uiState.isSearchActive) {
+            TopAppBar(
+                title = {
+                    TextField(
+                        value = uiState.searchQuery,
+                        onValueChange = onSearchQueryChange,
+                        placeholder = {
+                            Text(
+                                text = "Search coins...",
+                                color = CoinPulseColors.TextSecondary
+                            )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(24.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = CoinPulseColors.TextPrimary,
+                            unfocusedTextColor = CoinPulseColors.TextPrimary,
+                            focusedContainerColor = CoinPulseColors.Surface,
+                            unfocusedContainerColor = CoinPulseColors.Surface,
+                            cursorColor = CoinPulseColors.Primary,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .padding(end = 8.dp)
                     )
-                    if (uiState.lastUpdated.isNotEmpty()) {
-                        Text(
-                            text = "Updated: ${uiState.lastUpdated}",
-                            color = CoinPulseColors.TextSecondary,
-                            fontSize = 11.sp
+                },
+                navigationIcon = {
+                    IconButton(onClick = { onSearchActiveChange(false) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = CoinPulseColors.TextPrimary
                         )
                     }
-                }
-            },
-            actions = {
-                IconButton(
-                    onClick = onRefresh,
-                    enabled = uiState.isRefreshEnabled
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refresh",
-                        tint = if (uiState.isRefreshEnabled)
-                            CoinPulseColors.TextPrimary
-                        else
-                            CoinPulseColors.TextSecondary
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = CoinPulseColors.Background
+                },
+                actions = {
+                    if (uiState.searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { onSearchQueryChange("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = CoinPulseColors.TextPrimary
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = CoinPulseColors.Background
+                )
             )
-        )
+        } else {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text(
+                            text = "CoinPulse",
+                            color = CoinPulseColors.TextPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 22.sp
+                        )
+                        if (uiState.lastUpdated.isNotEmpty()) {
+                            Text(
+                                text = "Updated: ${uiState.lastUpdated}",
+                                color = CoinPulseColors.TextSecondary,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onSearchActiveChange(true) }) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = CoinPulseColors.TextPrimary
+                        )
+                    }
+                    IconButton(
+                        onClick = onRefresh,
+                        enabled = uiState.isRefreshEnabled
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Refresh",
+                            tint = if (uiState.isRefreshEnabled)
+                                CoinPulseColors.TextPrimary
+                            else
+                                CoinPulseColors.TextSecondary
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = CoinPulseColors.Background
+                )
+            )
+        }
 
         when {
             uiState.isLoading && uiState.coins.isEmpty() -> {
@@ -133,16 +208,18 @@ fun CoinListContent(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         CoinLazyList(
-                            coins = uiState.coins,
+                            coins = uiState.filteredCoins,
                             favorites = uiState.favorites,
+                            showSummaryCard = !uiState.isSearchActive,
                             onCoinClick = onCoinClick,
                             onFavoriteClick = onFavoriteClick
                         )
                     }
                 } else {
                     CoinLazyList(
-                        coins = uiState.coins,
+                        coins = uiState.filteredCoins,
                         favorites = uiState.favorites,
+                        showSummaryCard = !uiState.isSearchActive,
                         onCoinClick = onCoinClick,
                         onFavoriteClick = onFavoriteClick
                     )
@@ -156,6 +233,7 @@ fun CoinListContent(
 private fun CoinLazyList(
     coins: List<Coin>,
     favorites: Set<String>,
+    showSummaryCard: Boolean,
     onCoinClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit
 ) {
@@ -169,7 +247,9 @@ private fun CoinLazyList(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item { SummaryCard(coins = coins) }
+            if (showSummaryCard) {
+                item { SummaryCard(coins = coins) }
+            }
             items(coins) { coin ->
                 CoinItem(
                     coin = coin,
@@ -230,7 +310,45 @@ fun CoinListContentDataPreview() {
             ),
             onCoinClick = {},
             onFavoriteClick = {},
-            onRefresh = {}
+            onRefresh = {},
+            onSearchQueryChange = {},
+            onSearchActiveChange = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "CoinList - Search Active")
+@Composable
+fun CoinListContentSearchPreview() {
+    val dummyCoins = listOf(
+        Coin(
+            id = "bitcoin",
+            symbol = "btc",
+            name = "Bitcoin",
+            currentPrice = 70000.0,
+            priceChangePercentage24h = 4.61,
+            marketCap = 1380000000000.0,
+            totalVolume = 28000000000.0,
+            imageUrl = "",
+            marketCapRank = 1,
+            high24h = 71000.0,
+            low24h = 69000.0
+        )
+    )
+
+    CoinPulseTheme {
+        CoinListContent(
+            uiState = CoinUiState(
+                coins = dummyCoins,
+                favorites = emptySet(),
+                isSearchActive = true,
+                searchQuery = "Bit"
+            ),
+            onCoinClick = {},
+            onFavoriteClick = {},
+            onRefresh = {},
+            onSearchQueryChange = {},
+            onSearchActiveChange = {}
         )
     }
 }
@@ -243,7 +361,9 @@ fun CoinListContentLoadingPreview() {
             uiState = CoinUiState(isLoading = true),
             onCoinClick = {},
             onFavoriteClick = {},
-            onRefresh = {}
+            onRefresh = {},
+            onSearchQueryChange = {},
+            onSearchActiveChange = {}
         )
     }
 }
@@ -256,7 +376,9 @@ fun CoinListContentErrorPreview() {
             uiState = CoinUiState(errorMessage = "Rate limit exceeded. Please wait a moment."),
             onCoinClick = {},
             onFavoriteClick = {},
-            onRefresh = {}
+            onRefresh = {},
+            onSearchQueryChange = {},
+            onSearchActiveChange = {}
         )
     }
 }
