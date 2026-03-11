@@ -9,7 +9,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -17,18 +16,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.revive.coinpulse.data.CoinCacheStorage
-import com.revive.coinpulse.data.CoinRepositoryImpl
-import com.revive.coinpulse.data.FavoriteStorage
-import com.revive.coinpulse.data.createSettings
-import com.revive.coinpulse.data.remote.CoinRemoteDataSource
-import com.revive.coinpulse.data.remote.createHttpClient
 import com.revive.coinpulse.presentation.ui.screen.CoinDetailScreen
 import com.revive.coinpulse.presentation.ui.screen.CoinFavoriteScreen
 import com.revive.coinpulse.presentation.ui.screen.CoinListScreen
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import kotlinx.serialization.Serializable
+import org.koin.compose.viewmodel.koinViewModel
 
 @Serializable
 data class CoinDetailRoute(val coinId: String)
@@ -36,15 +30,7 @@ data class CoinDetailRoute(val coinId: String)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
-    val viewModel = remember {
-        val httpClient = createHttpClient()
-        val remoteDataSource = CoinRemoteDataSource(httpClient)
-        val favoriteStorage = FavoriteStorage(createSettings())
-        val cacheStorage = CoinCacheStorage(createSettings())
-        val repository = CoinRepositoryImpl(remoteDataSource, favoriteStorage, cacheStorage)
-        CoinViewModel(repository)
-    }
+    val viewModel = koinViewModel<CoinViewModel>()
 
     val bottomNavItems = listOf(BottomNavItem.Home, BottomNavItem.Favorites)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -59,7 +45,7 @@ fun AppNavigation() {
                 ) {
                     bottomNavItems.forEach { item ->
                         NavigationBarItem(
-                            selected = currentRoute.contains(item.route),
+                            selected = currentRoute?.contains(item.route) == true,
                             onClick = {
                                 navController.navigate(item.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
