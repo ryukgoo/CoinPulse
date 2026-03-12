@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.revive.coinpulse.data.AppSettings
+import com.revive.coinpulse.data.AppTheme
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseTheme
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
@@ -45,7 +46,8 @@ fun SettingsScreen(viewModel: CoinViewModel) {
         settingsUiState = settingsUiState,
         onCurrencyChange = { viewModel.onCurrencyChange(it) },
         onRefreshIntervalChange = { viewModel.onRefreshIntervalChange(it) },
-        onCoinCountChange = { viewModel.onCoinCountChange(it) }
+        onCoinCountChange = { viewModel.onCoinCountChange(it) },
+        onThemeChange = { viewModel.onThemeChange(it) }
     )
 }
 
@@ -55,11 +57,13 @@ fun SettingsContent(
     settingsUiState: SettingsUiState,
     onCurrencyChange: (String) -> Unit,
     onRefreshIntervalChange: (Long) -> Unit,
-    onCoinCountChange: (Int) -> Unit
+    onCoinCountChange: (Int) -> Unit,
+    onThemeChange: (AppTheme) -> Unit
 ) {
     var showCurrencySheet by remember { mutableStateOf(false) }
     var showRefreshSheet by remember { mutableStateOf(false) }
     var showCoinCountSheet by remember { mutableStateOf(false) }
+    var showThemeSheet by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -80,7 +84,13 @@ fun SettingsContent(
             )
         )
 
-        // 통화 설정
+        SettingsItem(
+            title = "Theme",
+            value = AppSettings.themeLabel(settingsUiState.theme),
+            onClick = { showThemeSheet = true }
+        )
+        HorizontalDivider(color = CoinPulseColors.Surface)
+
         SettingsItem(
             title = "Currency",
             value = settingsUiState.currency.uppercase(),
@@ -88,7 +98,6 @@ fun SettingsContent(
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
-        // 자동 새로고침 간격
         SettingsItem(
             title = "Auto Refresh",
             value = AppSettings.refreshIntervalLabel(settingsUiState.refreshInterval),
@@ -96,7 +105,6 @@ fun SettingsContent(
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
-        // 코인 표시 개수
         SettingsItem(
             title = "Coin Count",
             value = AppSettings.coinCountLabel(settingsUiState.coinCount),
@@ -104,7 +112,6 @@ fun SettingsContent(
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
-        // 앱 버전
         SettingsItem(
             title = "Version",
             value = "1.0.0",
@@ -113,7 +120,26 @@ fun SettingsContent(
         HorizontalDivider(color = CoinPulseColors.Surface)
     }
 
-    // 통화 선택 BottomSheet
+    if (showThemeSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showThemeSheet = false },
+            sheetState = rememberModalBottomSheetState(),
+            containerColor = CoinPulseColors.Surface
+        ) {
+            BottomSheetTitle("Select Theme")
+            AppSettings.THEMES.forEach { theme ->
+                BottomSheetItem(
+                    label = AppSettings.themeLabel(theme),
+                    isSelected = theme == settingsUiState.theme,
+                    onClick = {
+                        onThemeChange(theme)
+                        showThemeSheet = false
+                    }
+                )
+            }
+        }
+    }
+
     if (showCurrencySheet) {
         ModalBottomSheet(
             onDismissRequest = { showCurrencySheet = false },
@@ -134,7 +160,6 @@ fun SettingsContent(
         }
     }
 
-    // 새로고침 간격 선택 BottomSheet
     if (showRefreshSheet) {
         ModalBottomSheet(
             onDismissRequest = { showRefreshSheet = false },
@@ -155,7 +180,6 @@ fun SettingsContent(
         }
     }
 
-    // 코인 개수 선택 BottomSheet
     if (showCoinCountSheet) {
         ModalBottomSheet(
             onDismissRequest = { showCoinCountSheet = false },
@@ -258,7 +282,8 @@ fun SettingsContentPreview() {
             ),
             onCurrencyChange = {},
             onRefreshIntervalChange = {},
-            onCoinCountChange = {}
+            onCoinCountChange = {},
+            onThemeChange = {}
         )
     }
 }

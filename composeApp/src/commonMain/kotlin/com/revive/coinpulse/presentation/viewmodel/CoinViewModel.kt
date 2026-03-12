@@ -3,6 +3,7 @@ package com.revive.coinpulse.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revive.coinpulse.data.AppSettings
+import com.revive.coinpulse.data.AppTheme
 import com.revive.coinpulse.data.model.Coin
 import com.revive.coinpulse.domain.usecase.GetCachedCoinsUseCase
 import com.revive.coinpulse.domain.usecase.GetCoinsUseCase
@@ -36,7 +37,8 @@ data class CoinUiState(
 data class SettingsUiState(
     val currency: String = "usd",
     val refreshInterval: Long = 60L,
-    val coinCount: Int = 100
+    val coinCount: Int = 100,
+    val theme: AppTheme = AppTheme.SYSTEM
 )
 
 class CoinViewModel(
@@ -54,7 +56,8 @@ class CoinViewModel(
         SettingsUiState(
             currency = appSettings.currency,
             refreshInterval = appSettings.refreshInterval,
-            coinCount = appSettings.coinCount
+            coinCount = appSettings.coinCount,
+            theme = appSettings.theme
         )
     )
     val settingsUiState: StateFlow<SettingsUiState> = _settingsUiState.asStateFlow()
@@ -185,6 +188,11 @@ class CoinViewModel(
         appSettings.coinCount = count
         _settingsUiState.value = _settingsUiState.value.copy(coinCount = count)
         startPolling()
+    }
+
+    fun onThemeChange(theme: AppTheme) {
+        appSettings.theme = theme
+        _settingsUiState.value = _settingsUiState.value.copy(theme = theme)
     }
 
     override fun onCleared() {

@@ -23,21 +23,20 @@ import com.revive.coinpulse.presentation.ui.screen.SettingsScreen
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import kotlinx.serialization.Serializable
-import org.koin.compose.viewmodel.koinViewModel
 
 @Serializable
 data class CoinDetailRoute(val coinId: String)
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(viewModel: CoinViewModel) {
     val navController = rememberNavController()
-    val viewModel = koinViewModel<CoinViewModel>()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showBottomBar = currentRoute?.contains("CoinDetailRoute") == false
 
     Scaffold(
+        containerColor = CoinPulseColors.Background,
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(containerColor = CoinPulseColors.Surface) {
