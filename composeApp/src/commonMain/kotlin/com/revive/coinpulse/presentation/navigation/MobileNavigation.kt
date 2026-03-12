@@ -101,6 +101,9 @@ fun MobileNavigation(viewModel: CoinViewModel) {
                 CoinDetailScreen(
                     coin = coin,
                     currency = viewModel.uiState.value.currency,
+                    chartData = viewModel.uiState.value.chartData,
+                    isChartLoading = viewModel.uiState.value.isChartLoading,
+                    onLoadChart = { viewModel.loadChart(it) },
                     onBackClick = { navController.popBackStack() }
                 )
             }

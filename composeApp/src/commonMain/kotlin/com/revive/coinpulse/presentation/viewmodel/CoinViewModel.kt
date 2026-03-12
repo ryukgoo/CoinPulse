@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.revive.coinpulse.data.AppSettings
 import com.revive.coinpulse.data.AppTheme
 import com.revive.coinpulse.data.model.Coin
+import com.revive.coinpulse.data.model.PricePoint
 import com.revive.coinpulse.domain.usecase.GetCachedCoinsUseCase
 import com.revive.coinpulse.domain.usecase.GetCoinsUseCase
+import com.revive.coinpulse.domain.usecase.GetMarketChartUseCase
 import com.revive.coinpulse.domain.usecase.ObserveFavoritesUseCase
 import com.revive.coinpulse.domain.usecase.ToggleFavoriteUseCase
 import com.revive.coinpulse.getCurrentTime
@@ -15,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class CoinUiState(
@@ -27,7 +30,10 @@ data class CoinUiState(
     val searchQuery: String = "",
     val isSearchActive: Boolean = false,
     val snackbarMessage: String? = null,
-    val currency: String = "usd"
+    val currency: String = "usd",
+    val chartData: List<PricePoint> = emptyList(),
+    val isChartLoading: Boolean = false,
+    val chartError: String? = null
 ) {
     val filteredCoins: List<Coin>
         get() = if (searchQuery.isEmpty()) coins
@@ -46,6 +52,7 @@ class CoinViewModel(
     private val getCachedCoinsUseCase: GetCachedCoinsUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
+    private val getMarketChartUseCase: GetMarketChartUseCase,
     private val appSettings: AppSettings
 ) : ViewModel() {
 
@@ -154,6 +161,25 @@ class CoinViewModel(
     }
 
     fun toggleFavorite(coinId: String) = toggleFavoriteUseCase(coinId)
+
+    fun loadChart(coinId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isChartLoading = true, chartError = null) }
+            getMarketChartUseCase(coinId, _uiState.value.currency)
+                .onSuccess { points ->
+                    _uiState.update { it.copy(
+                        chartData = points,
+                        isChartLoading = false
+                    )}
+                }
+                .onFailure { e ->
+                    _uiState.update { it.copy(
+                        isChartLoading = false,
+                        chartError = e.message
+                    )}
+                }
+        }
+    }
 
     fun onSearchQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)

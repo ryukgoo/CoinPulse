@@ -5,6 +5,7 @@ object CoinGeckoApi {
 
     object Endpoints {
         const val COINS_MARKETS = "/coins/markets"
+        const val MARKET_CHART = "/coins/{id}/market_chart"
     }
 
     object Params {
@@ -13,6 +14,7 @@ object CoinGeckoApi {
         const val PER_PAGE = "per_page"
         const val PAGE = "page"
         const val SPARKLINE = "sparkline"
+        const val DAYS = "days"
     }
 
     object Defaults {
@@ -21,5 +23,6 @@ object CoinGeckoApi {
         const val PER_PAGE = 100
         const val PAGE = 1
         const val SPARKLINE = false
+        const val CHART_DAYS = 7
     }
 }

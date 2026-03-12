@@ -2,6 +2,7 @@ package com.revive.coinpulse.presentation.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -23,15 +25,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.revive.coinpulse.data.model.Coin
+import com.revive.coinpulse.data.model.PricePoint
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseTheme
 import com.revive.coinpulse.toFormattedPercent
@@ -41,11 +46,17 @@ import com.revive.coinpulse.toFormattedPrice
 fun CoinDetailScreen(
     coin: Coin,
     currency: String = "usd",
+    chartData: List<PricePoint> = emptyList(),
+    isChartLoading: Boolean = false,
+    onLoadChart: (String) -> Unit = {},
     onBackClick: () -> Unit
 ) {
     CoinDetailContent(
         coin = coin,
         currency = currency,
+        chartData = chartData,
+        isChartLoading = isChartLoading,
+        onLoadChart = onLoadChart,
         onBackClick = onBackClick
     )
 }
@@ -55,10 +66,20 @@ fun CoinDetailScreen(
 fun CoinDetailContent(
     coin: Coin,
     currency: String = "usd",
+    chartData: List<PricePoint> = emptyList(),
+    isChartLoading: Boolean = false,
+    onLoadChart: (String) -> Unit = {},
     onBackClick: () -> Unit
 ) {
+    LaunchedEffect(coin.id) {
+        onLoadChart(coin.id)
+    }
+
     val priceChange = coin.priceChangePercentage24h ?: 0.0
     val priceChangeColor = if (priceChange >= 0) CoinPulseColors.PriceUp else CoinPulseColors.PriceDown
+    val isUp = priceChange >= 0
+    val chartColor = if (isUp) CoinPulseColors.PriceUp else CoinPulseColors.PriceDown
+    val chartGradientColor = if (isUp) Color(0x6600C853) else Color(0x66FF1744)
 
     Column(
         modifier = Modifier
@@ -94,6 +115,7 @@ fun CoinDetailContent(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // 코인 헤더
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -126,8 +148,9 @@ fun CoinDetailContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
+            // 현재 가격
             Column {
                 Text(
                     text = coin.currentPrice.toFormattedPrice(currency),
@@ -142,8 +165,62 @@ fun CoinDetailContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
+            // 차트 영역
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(CoinPulseColors.Surface)
+                    .padding(16.dp)
+            ) {
+                when {
+                    isChartLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = CoinPulseColors.Primary)
+                        }
+                    }
+                    chartData.isNotEmpty() -> {
+                        Column {
+                            Text(
+                                text = "7 Days",
+                                color = CoinPulseColors.TextSecondary,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            PriceChart(
+                                pricePoints = chartData,
+                                lineColor = chartColor,
+                                gradientStartColor = chartGradientColor
+                            )
+                        }
+                    }
+                    else -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No chart data",
+                                color = CoinPulseColors.TextSecondary,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // 상세 정보
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

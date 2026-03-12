@@ -1,6 +1,7 @@
 package com.revive.coinpulse.data
 
 import com.revive.coinpulse.data.model.Coin
+import com.revive.coinpulse.data.model.PricePoint
 import com.revive.coinpulse.data.remote.CoinRemoteDataSource
 import com.revive.coinpulse.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,18 @@ class CoinRepositoryImpl(
             )
             cacheStorage.saveCoins(coins)
             Result.success(coins)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getMarketChart(
+        coinId: String,
+        currency: String
+    ): Result<List<PricePoint>> {
+        return try {
+            val points = remoteDataSource.getMarketChart(coinId, currency)
+            Result.success(points)
         } catch (e: Exception) {
             Result.failure(e)
         }
