@@ -47,7 +47,7 @@ fun SettingsScreen(viewModel: CoinViewModel) {
         onCurrencyChange = { viewModel.onCurrencyChange(it) },
         onRefreshIntervalChange = { viewModel.onRefreshIntervalChange(it) },
         onCoinCountChange = { viewModel.onCoinCountChange(it) },
-        onThemeChange = { viewModel.onThemeChange(it) }
+        onThemeChange = { viewModel.onThemeChange(it) },
     )
 }
 
@@ -58,7 +58,7 @@ fun SettingsContent(
     onCurrencyChange: (String) -> Unit,
     onRefreshIntervalChange: (Long) -> Unit,
     onCoinCountChange: (Int) -> Unit,
-    onThemeChange: (AppTheme) -> Unit
+    onThemeChange: (AppTheme) -> Unit,
 ) {
     var showCurrencySheet by remember { mutableStateOf(false) }
     var showRefreshSheet by remember { mutableStateOf(false) }
@@ -66,9 +66,10 @@ fun SettingsContent(
     var showThemeSheet by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CoinPulseColors.Background)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CoinPulseColors.Background),
     ) {
         TopAppBar(
             title = {
@@ -76,46 +77,47 @@ fun SettingsContent(
                     text = "Settings",
                     color = CoinPulseColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
+                    fontSize = 22.sp,
                 )
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = CoinPulseColors.Background
-            )
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = CoinPulseColors.Background,
+                ),
         )
 
         SettingsItem(
             title = "Theme",
             value = AppSettings.themeLabel(settingsUiState.theme),
-            onClick = { showThemeSheet = true }
+            onClick = { showThemeSheet = true },
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
         SettingsItem(
             title = "Currency",
             value = settingsUiState.currency.uppercase(),
-            onClick = { showCurrencySheet = true }
+            onClick = { showCurrencySheet = true },
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
         SettingsItem(
             title = "Auto Refresh",
             value = AppSettings.refreshIntervalLabel(settingsUiState.refreshInterval),
-            onClick = { showRefreshSheet = true }
+            onClick = { showRefreshSheet = true },
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
         SettingsItem(
             title = "Coin Count",
             value = AppSettings.coinCountLabel(settingsUiState.coinCount),
-            onClick = { showCoinCountSheet = true }
+            onClick = { showCoinCountSheet = true },
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
 
         SettingsItem(
             title = "Version",
             value = "1.0.0",
-            onClick = {}
+            onClick = {},
         )
         HorizontalDivider(color = CoinPulseColors.Surface)
     }
@@ -124,7 +126,7 @@ fun SettingsContent(
         ModalBottomSheet(
             onDismissRequest = { showThemeSheet = false },
             sheetState = rememberModalBottomSheetState(),
-            containerColor = CoinPulseColors.Surface
+            containerColor = CoinPulseColors.Surface,
         ) {
             BottomSheetTitle("Select Theme")
             AppSettings.THEMES.forEach { theme ->
@@ -134,7 +136,7 @@ fun SettingsContent(
                     onClick = {
                         onThemeChange(theme)
                         showThemeSheet = false
-                    }
+                    },
                 )
             }
         }
@@ -144,7 +146,7 @@ fun SettingsContent(
         ModalBottomSheet(
             onDismissRequest = { showCurrencySheet = false },
             sheetState = rememberModalBottomSheetState(),
-            containerColor = CoinPulseColors.Surface
+            containerColor = CoinPulseColors.Surface,
         ) {
             BottomSheetTitle("Select Currency")
             AppSettings.CURRENCIES.forEach { currency ->
@@ -154,7 +156,7 @@ fun SettingsContent(
                     onClick = {
                         onCurrencyChange(currency)
                         showCurrencySheet = false
-                    }
+                    },
                 )
             }
         }
@@ -164,7 +166,7 @@ fun SettingsContent(
         ModalBottomSheet(
             onDismissRequest = { showRefreshSheet = false },
             sheetState = rememberModalBottomSheetState(),
-            containerColor = CoinPulseColors.Surface
+            containerColor = CoinPulseColors.Surface,
         ) {
             BottomSheetTitle("Auto Refresh Interval")
             AppSettings.REFRESH_INTERVALS.forEach { interval ->
@@ -174,7 +176,7 @@ fun SettingsContent(
                     onClick = {
                         onRefreshIntervalChange(interval)
                         showRefreshSheet = false
-                    }
+                    },
                 )
             }
         }
@@ -184,7 +186,7 @@ fun SettingsContent(
         ModalBottomSheet(
             onDismissRequest = { showCoinCountSheet = false },
             sheetState = rememberModalBottomSheetState(),
-            containerColor = CoinPulseColors.Surface
+            containerColor = CoinPulseColors.Surface,
         ) {
             BottomSheetTitle("Coin Display Count")
             AppSettings.COIN_COUNTS.forEach { count ->
@@ -194,7 +196,7 @@ fun SettingsContent(
                     onClick = {
                         onCoinCountChange(count)
                         showCoinCountSheet = false
-                    }
+                    },
                 )
             }
         }
@@ -205,25 +207,26 @@ fun SettingsContent(
 private fun SettingsItem(
     title: String,
     value: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = title,
             color = CoinPulseColors.TextPrimary,
             fontSize = 16.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         Text(
             text = value,
             color = CoinPulseColors.TextSecondary,
-            fontSize = 16.sp
+            fontSize = 16.sp,
         )
     }
 }
@@ -235,7 +238,7 @@ private fun BottomSheetTitle(title: String) {
         color = CoinPulseColors.TextPrimary,
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
     )
     HorizontalDivider(color = CoinPulseColors.Background)
 }
@@ -244,27 +247,28 @@ private fun BottomSheetTitle(title: String) {
 private fun BottomSheetItem(
     label: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
             color = if (isSelected) CoinPulseColors.Primary else CoinPulseColors.TextPrimary,
             fontSize = 16.sp,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         if (isSelected) {
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = null,
-                tint = CoinPulseColors.Primary
+                tint = CoinPulseColors.Primary,
             )
         }
     }
@@ -275,15 +279,16 @@ private fun BottomSheetItem(
 fun SettingsContentPreview() {
     CoinPulseTheme {
         SettingsContent(
-            settingsUiState = SettingsUiState(
-                currency = "usd",
-                refreshInterval = 60L,
-                coinCount = 100
-            ),
+            settingsUiState =
+                SettingsUiState(
+                    currency = "usd",
+                    refreshInterval = 60L,
+                    coinCount = 100,
+                ),
             onCurrencyChange = {},
             onRefreshIntervalChange = {},
             onCoinCountChange = {},
-            onThemeChange = {}
+            onThemeChange = {},
         )
     }
 }

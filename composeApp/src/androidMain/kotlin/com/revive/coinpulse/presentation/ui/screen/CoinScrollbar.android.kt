@@ -5,4 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun CoinScrollbar(listState: LazyListState, modifier: Modifier) {}
+actual fun CoinScrollbar(
+    listState: LazyListState,
+    modifier: Modifier,
+) {}

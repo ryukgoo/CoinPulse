@@ -17,7 +17,7 @@ fun AppNavigation(viewModel: CoinViewModel) {
     } else {
         AdaptiveNavigation(
             viewModel = viewModel,
-            windowSizeClass = windowSizeClass
+            windowSizeClass = windowSizeClass,
         )
     }
 }

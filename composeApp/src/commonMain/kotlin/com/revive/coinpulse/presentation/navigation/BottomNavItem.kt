@@ -9,9 +9,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 enum class BottomNavItem(
     val route: String,
     val label: String,
-    val icon: ImageVector
+    val icon: ImageVector,
 ) {
     Home("home", "Home", Icons.Default.Home),
     Favorites("favorites", "Favorites", Icons.Default.Favorite),
-    Settings("settings", "Settings", Icons.Default.Settings)
+    Settings("settings", "Settings", Icons.Default.Settings),
 }

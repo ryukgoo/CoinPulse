@@ -5,13 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChartData(
-    @SerialName("prices") val prices: List<List<Double>>
+    @SerialName("prices") val prices: List<List<Double>>,
 )
 
 data class PricePoint(
     val timestamp: Long,
-    val price: Double
+    val price: Double,
 )
 
-fun ChartData.toPricePoints(): List<PricePoint> =
-    prices.map { PricePoint(it[0].toLong(), it[1]) }
+fun ChartData.toPricePoints(): List<PricePoint> = prices.map { PricePoint(it[0].toLong(), it[1]) }

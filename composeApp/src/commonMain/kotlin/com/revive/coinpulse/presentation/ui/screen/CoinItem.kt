@@ -36,29 +36,30 @@ fun CoinItem(
     isFavorite: Boolean,
     currency: String = "usd",
     onCoinClick: () -> Unit,
-    onFavoriteClick: () -> Unit
+    onFavoriteClick: () -> Unit,
 ) {
     val favoriteColor = if (isFavorite) Color(0xFFFFD700) else CoinPulseColors.TextSecondary
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(CoinPulseColors.Surface)
-            .clickable { onCoinClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(CoinPulseColors.Surface)
+                .clickable { onCoinClick() }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             AsyncImage(
                 model = coin.imageUrl,
                 contentDescription = coin.name,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(40.dp),
             )
             Column {
                 Text(
@@ -67,43 +68,47 @@ fun CoinItem(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = coin.symbol.uppercase(),
                     color = CoinPulseColors.TextSecondary,
                     fontSize = 12.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = coin.currentPrice.toFormattedPrice(currency),
                     color = CoinPulseColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
                 )
                 val priceChange = coin.priceChangePercentage24h ?: 0.0
-                val priceChangeColor = if (priceChange >= 0)
-                    CoinPulseColors.PriceUp else CoinPulseColors.PriceDown
+                val priceChangeColor =
+                    if (priceChange >= 0) {
+                        CoinPulseColors.PriceUp
+                    } else {
+                        CoinPulseColors.PriceDown
+                    }
                 Text(
                     text = priceChange.toFormattedPercent(),
                     color = priceChangeColor,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
                 )
             }
             IconButton(onClick = onFavoriteClick) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = "Favorite",
-                    tint = favoriteColor
+                    tint = favoriteColor,
                 )
             }
         }

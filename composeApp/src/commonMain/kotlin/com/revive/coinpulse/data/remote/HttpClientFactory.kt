@@ -8,10 +8,12 @@ import kotlinx.serialization.json.Json
 fun createHttpClient(): HttpClient {
     return HttpClient {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true  // API 응답에 모르는 필드 있어도 무시
-                isLenient = true
-            })
+            json(
+                Json {
+                    ignoreUnknownKeys = true // API 응답에 모르는 필드 있어도 무시
+                    isLenient = true
+                },
+            )
         }
     }
 }

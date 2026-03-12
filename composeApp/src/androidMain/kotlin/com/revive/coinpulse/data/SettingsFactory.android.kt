@@ -8,6 +8,6 @@ lateinit var appContext: Context
 
 actual fun createSettings(): Settings {
     return SharedPreferencesSettings(
-        appContext.getSharedPreferences("coinpulse_prefs", Context.MODE_PRIVATE)
+        appContext.getSharedPreferences("coinpulse_prefs", Context.MODE_PRIVATE),
     )
 }

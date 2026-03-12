@@ -11,17 +11,21 @@ import androidx.compose.ui.unit.dp
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseColors
 
 @Composable
-actual fun CoinScrollbar(listState: LazyListState, modifier: Modifier) {
+actual fun CoinScrollbar(
+    listState: LazyListState,
+    modifier: Modifier,
+) {
     VerticalScrollbar(
         modifier = modifier,
         adapter = rememberScrollbarAdapter(listState),
-        style = ScrollbarStyle(
-            minimalHeight = 16.dp,
-            thickness = 8.dp,
-            shape = RoundedCornerShape(4.dp),
-            hoverDurationMillis = 300,
-            unhoverColor = CoinPulseColors.TextSecondary.copy(alpha = 0.4f),
-            hoverColor = CoinPulseColors.TextSecondary
-        )
+        style =
+            ScrollbarStyle(
+                minimalHeight = 16.dp,
+                thickness = 8.dp,
+                shape = RoundedCornerShape(4.dp),
+                hoverDurationMillis = 300,
+                unhoverColor = CoinPulseColors.TextSecondary.copy(alpha = 0.4f),
+                hoverColor = CoinPulseColors.TextSecondary,
+            ),
     )
 }

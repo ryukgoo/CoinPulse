@@ -17,28 +17,30 @@ data class CoinPulseColorScheme(
     val TextPrimary: Color,
     val TextSecondary: Color,
     val PriceUp: Color,
-    val PriceDown: Color
+    val PriceDown: Color,
 )
 
-val DarkColorScheme = CoinPulseColorScheme(
-    Background = Color(0xFF0D1117),
-    Surface = Color(0xFF161B22),
-    Primary = Color(0xFF58A6FF),
-    TextPrimary = Color(0xFFE6EDF3),
-    TextSecondary = Color(0xFF8B949E),
-    PriceUp = Color(0xFF00C853),
-    PriceDown = Color(0xFFFF1744)
-)
+val DarkColorScheme =
+    CoinPulseColorScheme(
+        Background = Color(0xFF0D1117),
+        Surface = Color(0xFF161B22),
+        Primary = Color(0xFF58A6FF),
+        TextPrimary = Color(0xFFE6EDF3),
+        TextSecondary = Color(0xFF8B949E),
+        PriceUp = Color(0xFF00C853),
+        PriceDown = Color(0xFFFF1744),
+    )
 
-val LightColorScheme = CoinPulseColorScheme(
-    Background = Color(0xFFF6F8FA),
-    Surface = Color(0xFFFFFFFF),
-    Primary = Color(0xFF0969DA),
-    TextPrimary = Color(0xFF1F2328),
-    TextSecondary = Color(0xFF656D76),
-    PriceUp = Color(0xFF1A7F37),
-    PriceDown = Color(0xFFCF222E)
-)
+val LightColorScheme =
+    CoinPulseColorScheme(
+        Background = Color(0xFFF6F8FA),
+        Surface = Color(0xFFFFFFFF),
+        Primary = Color(0xFF0969DA),
+        TextPrimary = Color(0xFF1F2328),
+        TextSecondary = Color(0xFF656D76),
+        PriceUp = Color(0xFF1A7F37),
+        PriceDown = Color(0xFFCF222E),
+    )
 
 val LocalCoinPulseColors = staticCompositionLocalOf { DarkColorScheme }
 
@@ -66,13 +68,14 @@ object CoinPulseColors {
 @Composable
 fun CoinPulseTheme(
     appTheme: AppTheme = AppTheme.SYSTEM,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
-    val isDark = when (appTheme) {
-        AppTheme.DARK -> true
-        AppTheme.LIGHT -> false
-        AppTheme.SYSTEM -> isSystemInDarkTheme()
-    }
+    val isDark =
+        when (appTheme) {
+            AppTheme.DARK -> true
+            AppTheme.LIGHT -> false
+            AppTheme.SYSTEM -> isSystemInDarkTheme()
+        }
 
     val colorScheme = if (isDark) DarkColorScheme else LightColorScheme
 

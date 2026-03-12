@@ -10,14 +10,13 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 
 class CoinRemoteDataSource(private val httpClient: HttpClient) {
-
     suspend fun getCoins(
         currency: String = CoinGeckoApi.Defaults.CURRENCY,
         page: Int = CoinGeckoApi.Defaults.PAGE,
-        perPage: Int = CoinGeckoApi.Defaults.PER_PAGE
+        perPage: Int = CoinGeckoApi.Defaults.PER_PAGE,
     ): List<Coin> {
         return httpClient.get(
-            CoinGeckoApi.BASE_URL + CoinGeckoApi.Endpoints.COINS_MARKETS
+            CoinGeckoApi.BASE_URL + CoinGeckoApi.Endpoints.COINS_MARKETS,
         ) {
             parameter(CoinGeckoApi.Params.VS_CURRENCY, currency)
             parameter(CoinGeckoApi.Params.ORDER, CoinGeckoApi.Defaults.ORDER)
@@ -29,11 +28,11 @@ class CoinRemoteDataSource(private val httpClient: HttpClient) {
 
     suspend fun getMarketChart(
         coinId: String,
-        currency: String = CoinGeckoApi.Defaults.CURRENCY
+        currency: String = CoinGeckoApi.Defaults.CURRENCY,
     ): List<PricePoint> {
         return httpClient.get(
             CoinGeckoApi.BASE_URL +
-                    CoinGeckoApi.Endpoints.MARKET_CHART.replace("{id}", coinId)
+                CoinGeckoApi.Endpoints.MARKET_CHART.replace("{id}", coinId),
         ) {
             parameter(CoinGeckoApi.Params.VS_CURRENCY, currency)
             parameter(CoinGeckoApi.Params.DAYS, CoinGeckoApi.Defaults.CHART_DAYS)

@@ -49,7 +49,7 @@ fun CoinDetailScreen(
     chartData: List<PricePoint> = emptyList(),
     isChartLoading: Boolean = false,
     onLoadChart: (String) -> Unit = {},
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     CoinDetailContent(
         coin = coin,
@@ -57,7 +57,7 @@ fun CoinDetailScreen(
         chartData = chartData,
         isChartLoading = isChartLoading,
         onLoadChart = onLoadChart,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
     )
 }
 
@@ -69,7 +69,7 @@ fun CoinDetailContent(
     chartData: List<PricePoint> = emptyList(),
     isChartLoading: Boolean = false,
     onLoadChart: (String) -> Unit = {},
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     LaunchedEffect(coin.id) {
         onLoadChart(coin.id)
@@ -82,16 +82,17 @@ fun CoinDetailContent(
     val chartGradientColor = if (isUp) Color(0x6600C853) else Color(0x66FF1744)
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CoinPulseColors.Background)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CoinPulseColors.Background),
     ) {
         TopAppBar(
             title = {
                 Text(
                     text = coin.name,
                     color = CoinPulseColors.TextPrimary,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             },
             navigationIcon = {
@@ -99,44 +100,46 @@ fun CoinDetailContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = CoinPulseColors.TextPrimary
+                        tint = CoinPulseColors.TextPrimary,
                     )
                 }
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = CoinPulseColors.Background
-            )
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = CoinPulseColors.Background,
+                ),
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // 코인 헤더
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 AsyncImage(
                     model = coin.imageUrl,
                     contentDescription = coin.name,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(64.dp),
                 )
                 Column {
                     Text(
                         text = coin.name,
                         color = CoinPulseColors.TextPrimary,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+                        fontSize = 24.sp,
                     )
                     Text(
                         text = coin.symbol.uppercase(),
                         color = CoinPulseColors.TextSecondary,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -144,7 +147,7 @@ fun CoinDetailContent(
                     text = coin.marketCapRank?.let { "#$it" } ?: "-",
                     color = CoinPulseColors.Primary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
                 )
             }
 
@@ -156,12 +159,12 @@ fun CoinDetailContent(
                     text = coin.currentPrice.toFormattedPrice(currency),
                     color = CoinPulseColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 36.sp
+                    fontSize = 36.sp,
                 )
                 Text(
                     text = priceChange.toFormattedPercent(),
                     color = priceChangeColor,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
                 )
             }
 
@@ -169,19 +172,21 @@ fun CoinDetailContent(
 
             // 차트 영역
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(CoinPulseColors.Surface)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(CoinPulseColors.Surface)
+                        .padding(16.dp),
             ) {
                 when {
                     isChartLoading -> {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                            contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(color = CoinPulseColors.Primary)
                         }
@@ -192,26 +197,27 @@ fun CoinDetailContent(
                                 text = "7 Days",
                                 color = CoinPulseColors.TextSecondary,
                                 fontSize = 12.sp,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 8.dp),
                             )
                             PriceChart(
                                 pricePoints = chartData,
                                 lineColor = chartColor,
-                                gradientStartColor = chartGradientColor
+                                gradientStartColor = chartGradientColor,
                             )
                         }
                     }
                     else -> {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Text(
                                 text = "No chart data",
                                 color = CoinPulseColors.TextSecondary,
-                                fontSize = 14.sp
+                                fontSize = 14.sp,
                             )
                         }
                     }
@@ -222,12 +228,13 @@ fun CoinDetailContent(
 
             // 상세 정보
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(CoinPulseColors.Surface)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(CoinPulseColors.Surface)
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 DetailRow(label = "Market Cap", value = coin.marketCap.toFormattedPrice(currency))
                 HorizontalDivider(color = CoinPulseColors.Background)
@@ -242,22 +249,25 @@ fun CoinDetailContent(
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun DetailRow(
+    label: String,
+    value: String,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = label,
             color = CoinPulseColors.TextSecondary,
-            fontSize = 14.sp
+            fontSize = 14.sp,
         )
         Text(
             text = value,
             color = CoinPulseColors.TextPrimary,
             fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
+            fontSize = 14.sp,
         )
     }
 }
@@ -267,20 +277,21 @@ private fun DetailRow(label: String, value: String) {
 fun CoinDetailContentUpPreview() {
     CoinPulseTheme {
         CoinDetailContent(
-            coin = Coin(
-                id = "bitcoin",
-                symbol = "btc",
-                name = "Bitcoin",
-                currentPrice = 70000.0,
-                priceChangePercentage24h = 4.61,
-                marketCap = 1380000000000.0,
-                totalVolume = 28000000000.0,
-                imageUrl = "",
-                marketCapRank = 1,
-                high24h = 71000.0,
-                low24h = 69000.0
-            ),
-            onBackClick = {}
+            coin =
+                Coin(
+                    id = "bitcoin",
+                    symbol = "btc",
+                    name = "Bitcoin",
+                    currentPrice = 70000.0,
+                    priceChangePercentage24h = 4.61,
+                    marketCap = 1380000000000.0,
+                    totalVolume = 28000000000.0,
+                    imageUrl = "",
+                    marketCapRank = 1,
+                    high24h = 71000.0,
+                    low24h = 69000.0,
+                ),
+            onBackClick = {},
         )
     }
 }
@@ -290,20 +301,21 @@ fun CoinDetailContentUpPreview() {
 fun CoinDetailContentDownPreview() {
     CoinPulseTheme {
         CoinDetailContent(
-            coin = Coin(
-                id = "ethereum",
-                symbol = "eth",
-                name = "Ethereum",
-                currentPrice = 2066.49,
-                priceChangePercentage24h = -3.40,
-                marketCap = 248000000000.0,
-                totalVolume = 12000000000.0,
-                imageUrl = "",
-                marketCapRank = 2,
-                high24h = 2100.0,
-                low24h = 2000.0
-            ),
-            onBackClick = {}
+            coin =
+                Coin(
+                    id = "ethereum",
+                    symbol = "eth",
+                    name = "Ethereum",
+                    currentPrice = 2066.49,
+                    priceChangePercentage24h = -3.40,
+                    marketCap = 248000000000.0,
+                    totalVolume = 12000000000.0,
+                    imageUrl = "",
+                    marketCapRank = 2,
+                    high24h = 2100.0,
+                    low24h = 2000.0,
+                ),
+            onBackClick = {},
         )
     }
 }
@@ -313,20 +325,21 @@ fun CoinDetailContentDownPreview() {
 fun CoinDetailContentNullPreview() {
     CoinPulseTheme {
         CoinDetailContent(
-            coin = Coin(
-                id = "unknown",
-                symbol = "unk",
-                name = "Unknown Coin",
-                currentPrice = 0.0,
-                priceChangePercentage24h = null,
-                marketCap = 0.0,
-                totalVolume = 0.0,
-                imageUrl = "",
-                marketCapRank = null,
-                high24h = null,
-                low24h = null
-            ),
-            onBackClick = {}
+            coin =
+                Coin(
+                    id = "unknown",
+                    symbol = "unk",
+                    name = "Unknown Coin",
+                    currentPrice = 0.0,
+                    priceChangePercentage24h = null,
+                    marketCap = 0.0,
+                    totalVolume = 0.0,
+                    imageUrl = "",
+                    marketCapRank = null,
+                    high24h = null,
+                    low24h = null,
+                ),
+            onBackClick = {},
         )
     }
 }

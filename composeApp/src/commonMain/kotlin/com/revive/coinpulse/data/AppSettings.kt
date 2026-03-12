@@ -3,11 +3,12 @@ package com.revive.coinpulse.data
 import com.russhwolf.settings.Settings
 
 enum class AppTheme {
-    LIGHT, DARK, SYSTEM
+    LIGHT,
+    DARK,
+    SYSTEM,
 }
 
 class AppSettings(private val settings: Settings) {
-
     companion object {
         private const val KEY_CURRENCY = "currency"
         private const val KEY_REFRESH_INTERVAL = "refresh_interval"
@@ -19,21 +20,23 @@ class AppSettings(private val settings: Settings) {
         val COIN_COUNTS = listOf(50, 100, 250)
         val THEMES = listOf(AppTheme.LIGHT, AppTheme.DARK, AppTheme.SYSTEM)
 
-        fun refreshIntervalLabel(seconds: Long): String = when (seconds) {
-            30L -> "30초"
-            60L -> "1분"
-            180L -> "3분"
-            300L -> "5분"
-            else -> "1분"
-        }
+        fun refreshIntervalLabel(seconds: Long): String =
+            when (seconds) {
+                30L -> "30초"
+                60L -> "1분"
+                180L -> "3분"
+                300L -> "5분"
+                else -> "1분"
+            }
 
         fun coinCountLabel(count: Int): String = "${count}개"
 
-        fun themeLabel(theme: AppTheme): String = when (theme) {
-            AppTheme.LIGHT -> "Light"
-            AppTheme.DARK -> "Dark"
-            AppTheme.SYSTEM -> "System"
-        }
+        fun themeLabel(theme: AppTheme): String =
+            when (theme) {
+                AppTheme.LIGHT -> "Light"
+                AppTheme.DARK -> "Dark"
+                AppTheme.SYSTEM -> "System"
+            }
     }
 
     var currency: String

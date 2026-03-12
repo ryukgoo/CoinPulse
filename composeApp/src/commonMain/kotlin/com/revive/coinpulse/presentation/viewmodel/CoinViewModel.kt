@@ -33,18 +33,22 @@ data class CoinUiState(
     val currency: String = "usd",
     val chartData: List<PricePoint> = emptyList(),
     val isChartLoading: Boolean = false,
-    val chartError: String? = null
+    val chartError: String? = null,
 ) {
     val filteredCoins: List<Coin>
-        get() = if (searchQuery.isEmpty()) coins
-        else coins.filter { it.name.contains(searchQuery, ignoreCase = true) }
+        get() =
+            if (searchQuery.isEmpty()) {
+                coins
+            } else {
+                coins.filter { it.name.contains(searchQuery, ignoreCase = true) }
+            }
 }
 
 data class SettingsUiState(
     val currency: String = "usd",
     val refreshInterval: Long = 60L,
     val coinCount: Int = 100,
-    val theme: AppTheme = AppTheme.SYSTEM
+    val theme: AppTheme = AppTheme.SYSTEM,
 )
 
 class CoinViewModel(
@@ -53,20 +57,20 @@ class CoinViewModel(
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val observeFavoritesUseCase: ObserveFavoritesUseCase,
     private val getMarketChartUseCase: GetMarketChartUseCase,
-    private val appSettings: AppSettings
+    private val appSettings: AppSettings,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(CoinUiState())
     val uiState: StateFlow<CoinUiState> = _uiState.asStateFlow()
 
-    private val _settingsUiState = MutableStateFlow(
-        SettingsUiState(
-            currency = appSettings.currency,
-            refreshInterval = appSettings.refreshInterval,
-            coinCount = appSettings.coinCount,
-            theme = appSettings.theme
+    private val _settingsUiState =
+        MutableStateFlow(
+            SettingsUiState(
+                currency = appSettings.currency,
+                refreshInterval = appSettings.refreshInterval,
+                coinCount = appSettings.coinCount,
+                theme = appSettings.theme,
+            ),
         )
-    )
     val settingsUiState: StateFlow<SettingsUiState> = _settingsUiState.asStateFlow()
 
     private var pollingJob: Job? = null
@@ -80,21 +84,23 @@ class CoinViewModel(
 
     private fun loadCache() {
         if (getCachedCoinsUseCase.hasCachedData()) {
-            _uiState.value = _uiState.value.copy(
-                coins = getCachedCoinsUseCase(),
-                lastUpdated = getCachedCoinsUseCase.getCacheTime()
-            )
+            _uiState.value =
+                _uiState.value.copy(
+                    coins = getCachedCoinsUseCase(),
+                    lastUpdated = getCachedCoinsUseCase.getCacheTime(),
+                )
         }
     }
 
     private fun startPolling() {
         pollingJob?.cancel()
-        pollingJob = viewModelScope.launch {
-            while (true) {
-                getCoins()
-                delay(appSettings.refreshInterval * 1000)
+        pollingJob =
+            viewModelScope.launch {
+                while (true) {
+                    getCoins()
+                    delay(appSettings.refreshInterval * 1000)
+                }
             }
-        }
     }
 
     private fun observeFavorites() {
@@ -106,45 +112,51 @@ class CoinViewModel(
     }
 
     private suspend fun getCoins() {
-        _uiState.value = _uiState.value.copy(
-            isLoading = _uiState.value.coins.isEmpty(),
-            errorMessage = null
-        )
+        _uiState.value =
+            _uiState.value.copy(
+                isLoading = _uiState.value.coins.isEmpty(),
+                errorMessage = null,
+            )
 
         getCoinsUseCase(
             currency = appSettings.currency,
-            perPage = appSettings.coinCount
+            perPage = appSettings.coinCount,
         ).fold(
             onSuccess = { coins ->
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    coins = coins,
-                    lastUpdated = getCurrentTime(),
-                    currency = appSettings.currency
-                )
+                _uiState.value =
+                    _uiState.value.copy(
+                        isLoading = false,
+                        coins = coins,
+                        lastUpdated = getCurrentTime(),
+                        currency = appSettings.currency,
+                    )
             },
             onFailure = { error ->
                 val hasCachedData = _uiState.value.coins.isNotEmpty()
                 if (hasCachedData) {
-                    val message = when {
-                        error.message?.contains("429") == true -> "Rate limit exceeded. Showing cached data."
-                        else -> "Network error. Showing cached data."
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        snackbarMessage = message
-                    )
+                    val message =
+                        when {
+                            error.message?.contains("429") == true -> "Rate limit exceeded. Showing cached data."
+                            else -> "Network error. Showing cached data."
+                        }
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isLoading = false,
+                            snackbarMessage = message,
+                        )
                 } else {
-                    val message = when {
-                        error.message?.contains("429") == true -> "Rate limit exceeded. Please wait a moment."
-                        else -> error.message ?: "Unknown error"
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = message
-                    )
+                    val message =
+                        when {
+                            error.message?.contains("429") == true -> "Rate limit exceeded. Please wait a moment."
+                            else -> error.message ?: "Unknown error"
+                        }
+                    _uiState.value =
+                        _uiState.value.copy(
+                            isLoading = false,
+                            errorMessage = message,
+                        )
                 }
-            }
+            },
         )
     }
 
@@ -153,11 +165,12 @@ class CoinViewModel(
         _uiState.value = _uiState.value.copy(isRefreshEnabled = false)
 
         cooldownJob?.cancel()
-        cooldownJob = viewModelScope.launch {
-            startPolling()
-            delay(60_000)
-            _uiState.value = _uiState.value.copy(isRefreshEnabled = true)
-        }
+        cooldownJob =
+            viewModelScope.launch {
+                startPolling()
+                delay(60_000)
+                _uiState.value = _uiState.value.copy(isRefreshEnabled = true)
+            }
     }
 
     fun toggleFavorite(coinId: String) = toggleFavoriteUseCase(coinId)
@@ -167,16 +180,20 @@ class CoinViewModel(
             _uiState.update { it.copy(isChartLoading = true, chartError = null) }
             getMarketChartUseCase(coinId, _uiState.value.currency)
                 .onSuccess { points ->
-                    _uiState.update { it.copy(
-                        chartData = points,
-                        isChartLoading = false
-                    )}
+                    _uiState.update {
+                        it.copy(
+                            chartData = points,
+                            isChartLoading = false,
+                        )
+                    }
                 }
                 .onFailure { e ->
-                    _uiState.update { it.copy(
-                        isChartLoading = false,
-                        chartError = e.message
-                    )}
+                    _uiState.update {
+                        it.copy(
+                            isChartLoading = false,
+                            chartError = e.message,
+                        )
+                    }
                 }
         }
     }
@@ -186,10 +203,11 @@ class CoinViewModel(
     }
 
     fun onSearchActiveChange(isActive: Boolean) {
-        _uiState.value = _uiState.value.copy(
-            isSearchActive = isActive,
-            searchQuery = if (!isActive) "" else _uiState.value.searchQuery
-        )
+        _uiState.value =
+            _uiState.value.copy(
+                isSearchActive = isActive,
+                searchQuery = if (!isActive) "" else _uiState.value.searchQuery,
+            )
     }
 
     fun onSnackbarDismissed() {

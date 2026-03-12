@@ -25,11 +25,12 @@ fun AppWithSystemUI() {
         val settingsUiState by viewModel.settingsUiState.collectAsState()
 
         CoinPulseTheme(appTheme = settingsUiState.theme) {
-            val isDark = when (settingsUiState.theme) {
-                AppTheme.DARK -> true
-                AppTheme.LIGHT -> false
-                AppTheme.SYSTEM -> isSystemInDarkTheme()
-            }
+            val isDark =
+                when (settingsUiState.theme) {
+                    AppTheme.DARK -> true
+                    AppTheme.LIGHT -> false
+                    AppTheme.SYSTEM -> isSystemInDarkTheme()
+                }
             val context = LocalContext.current
             val activity = context as? Activity
 

@@ -15,5 +15,5 @@ data class Coin(
     @SerialName("image") val imageUrl: String = "",
     @SerialName("market_cap_rank") val marketCapRank: Int? = null,
     @SerialName("high_24h") val high24h: Double? = null,
-    @SerialName("low_24h") val low24h: Double? = null
+    @SerialName("low_24h") val low24h: Double? = null,
 )

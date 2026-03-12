@@ -1,0 +1,68 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+complexity:
+  active: true
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 8
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 20
+    thresholdInClasses: 15
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    ignoreAnnotated:
+      - 'Composable'  # Composable 함수는 PascalCase 허용
+      - 'ObjCName'
+  TopLevelPropertyNaming:
+    active: true
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+    ignoreAnnotated:
+      - 'Preview'
+  UnusedImports:
+    active: true
+  WildcardImport:
+    active: true
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: false  # KMP에서 Exception catch 허용
+  TooGenericExceptionThrown:
+    active: true
+
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  indentSize: 4

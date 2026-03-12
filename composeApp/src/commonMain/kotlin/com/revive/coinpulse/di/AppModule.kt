@@ -16,34 +16,33 @@ import com.revive.coinpulse.domain.usecase.ToggleFavoriteUseCase
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import org.koin.dsl.module
 
-val appModule = module {
-    // Network
-    single { createHttpClient() }
-    single { CoinRemoteDataSource(get()) }
+val appModule =
+    module {
+        // Network
+        single { createHttpClient() }
+        single { CoinRemoteDataSource(get()) }
 
-    // Storage
-    single { createSettings() }
-    single { FavoriteStorage(get()) }
-    single { CoinCacheStorage(get()) }
+        // Storage
+        single { createSettings() }
+        single { FavoriteStorage(get()) }
+        single { CoinCacheStorage(get()) }
 
-    // Repository
-    single<CoinRepository> { CoinRepositoryImpl(get(), get(), get()) }
+        // Repository
+        single<CoinRepository> { CoinRepositoryImpl(get(), get(), get()) }
 
+        // Use Cases
+        single { GetCoinsUseCase(get()) }
+        single { GetCachedCoinsUseCase(get()) }
+        single { ToggleFavoriteUseCase(get()) }
+        single { ObserveFavoritesUseCase(get()) }
+        single { GetMarketChartUseCase(get()) }
 
-    // Use Cases
-    single { GetCoinsUseCase(get()) }
-    single { GetCachedCoinsUseCase(get()) }
-    single { ToggleFavoriteUseCase(get()) }
-    single { ObserveFavoritesUseCase(get()) }
-    single { GetMarketChartUseCase(get()) }
+        // Storage
+        single { createSettings() }
+        single { FavoriteStorage(get()) }
+        single { CoinCacheStorage(get()) }
+        single { AppSettings(get()) }
 
-    // Storage
-    single { createSettings() }
-    single { FavoriteStorage(get()) }
-    single { CoinCacheStorage(get()) }
-    single { AppSettings(get()) }
-
-    // ViewModel
-    single { CoinViewModel(get(), get(), get(), get(), get(), get()) }
-}
-
+        // ViewModel
+        single { CoinViewModel(get(), get(), get(), get(), get(), get()) }
+    }

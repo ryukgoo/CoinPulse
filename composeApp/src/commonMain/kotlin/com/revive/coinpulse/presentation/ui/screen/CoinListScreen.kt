@@ -55,7 +55,7 @@ import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 @Composable
 fun CoinListScreen(
     viewModel: CoinViewModel,
-    onCoinClick: (String) -> Unit
+    onCoinClick: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -64,7 +64,7 @@ fun CoinListScreen(
         uiState.snackbarMessage?.let {
             snackbarHostState.showSnackbar(
                 message = it,
-                duration = SnackbarDuration.Short
+                duration = SnackbarDuration.Short,
             )
             viewModel.onSnackbarDismissed()
         }
@@ -76,11 +76,11 @@ fun CoinListScreen(
                 Snackbar(
                     snackbarData = data,
                     containerColor = CoinPulseColors.Surface,
-                    contentColor = CoinPulseColors.TextPrimary
+                    contentColor = CoinPulseColors.TextPrimary,
                 )
             }
         },
-        containerColor = CoinPulseColors.Background
+        containerColor = CoinPulseColors.Background,
     ) { innerPadding ->
         CoinListContent(
             uiState = uiState,
@@ -89,7 +89,7 @@ fun CoinListScreen(
             onRefresh = { viewModel.refresh() },
             onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
             onSearchActiveChange = { viewModel.onSearchActiveChange(it) },
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }
@@ -103,14 +103,15 @@ fun CoinListContent(
     onRefresh: () -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onSearchActiveChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(CoinPulseColors.Background)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(CoinPulseColors.Background),
     ) {
         if (uiState.isSearchActive) {
             TopAppBar(
@@ -121,24 +122,26 @@ fun CoinListContent(
                         placeholder = {
                             Text(
                                 text = "Search coins...",
-                                color = CoinPulseColors.TextSecondary
+                                color = CoinPulseColors.TextSecondary,
                             )
                         },
                         singleLine = true,
                         shape = RoundedCornerShape(24.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedTextColor = CoinPulseColors.TextPrimary,
-                            unfocusedTextColor = CoinPulseColors.TextPrimary,
-                            focusedContainerColor = CoinPulseColors.Surface,
-                            unfocusedContainerColor = CoinPulseColors.Surface,
-                            cursorColor = CoinPulseColors.Primary,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .padding(end = 8.dp)
+                        colors =
+                            TextFieldDefaults.colors(
+                                focusedTextColor = CoinPulseColors.TextPrimary,
+                                unfocusedTextColor = CoinPulseColors.TextPrimary,
+                                focusedContainerColor = CoinPulseColors.Surface,
+                                unfocusedContainerColor = CoinPulseColors.Surface,
+                                cursorColor = CoinPulseColors.Primary,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .padding(end = 8.dp),
                     )
                 },
                 navigationIcon = {
@@ -146,7 +149,7 @@ fun CoinListContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = CoinPulseColors.TextPrimary
+                            tint = CoinPulseColors.TextPrimary,
                         )
                     }
                 },
@@ -156,14 +159,15 @@ fun CoinListContent(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Clear",
-                                tint = CoinPulseColors.TextPrimary
+                                tint = CoinPulseColors.TextPrimary,
                             )
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CoinPulseColors.Background
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = CoinPulseColors.Background,
+                    ),
             )
         } else {
             TopAppBar(
@@ -173,13 +177,13 @@ fun CoinListContent(
                             text = "CoinPulse",
                             color = CoinPulseColors.TextPrimary,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp
+                            fontSize = 22.sp,
                         )
                         if (uiState.lastUpdated.isNotEmpty()) {
                             Text(
                                 text = "Updated: ${uiState.lastUpdated}",
                                 color = CoinPulseColors.TextSecondary,
-                                fontSize = 11.sp
+                                fontSize = 11.sp,
                             )
                         }
                     }
@@ -189,26 +193,29 @@ fun CoinListContent(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = CoinPulseColors.TextPrimary
+                            tint = CoinPulseColors.TextPrimary,
                         )
                     }
                     IconButton(
                         onClick = onRefresh,
-                        enabled = uiState.isRefreshEnabled
+                        enabled = uiState.isRefreshEnabled,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Refresh",
-                            tint = if (uiState.isRefreshEnabled)
-                                CoinPulseColors.TextPrimary
-                            else
-                                CoinPulseColors.TextSecondary
+                            tint =
+                                if (uiState.isRefreshEnabled) {
+                                    CoinPulseColors.TextPrimary
+                                } else {
+                                    CoinPulseColors.TextSecondary
+                                },
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = CoinPulseColors.Background
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = CoinPulseColors.Background,
+                    ),
             )
         }
 
@@ -216,7 +223,7 @@ fun CoinListContent(
             uiState.isLoading && uiState.coins.isEmpty() -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(color = CoinPulseColors.Primary)
                 }
@@ -224,11 +231,11 @@ fun CoinListContent(
             uiState.errorMessage != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = uiState.errorMessage,
-                        color = CoinPulseColors.PriceDown
+                        color = CoinPulseColors.PriceDown,
                     )
                 }
             }
@@ -238,7 +245,7 @@ fun CoinListContent(
                         isRefreshing = uiState.isLoading,
                         onRefresh = onRefresh,
                         state = pullToRefreshState,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         CoinLazyList(
                             coins = uiState.filteredCoins,
@@ -246,7 +253,7 @@ fun CoinListContent(
                             currency = uiState.currency,
                             showSummaryCard = !uiState.isSearchActive,
                             onCoinClick = onCoinClick,
-                            onFavoriteClick = onFavoriteClick
+                            onFavoriteClick = onFavoriteClick,
                         )
                     }
                 } else {
@@ -256,7 +263,7 @@ fun CoinListContent(
                         currency = uiState.currency,
                         showSummaryCard = !uiState.isSearchActive,
                         onCoinClick = onCoinClick,
-                        onFavoriteClick = onFavoriteClick
+                        onFavoriteClick = onFavoriteClick,
                     )
                 }
             }
@@ -271,17 +278,18 @@ private fun CoinLazyList(
     currency: String,
     showSummaryCard: Boolean,
     onCoinClick: (String) -> Unit,
-    onFavoriteClick: (String) -> Unit
+    onFavoriteClick: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (showSummaryCard) {
                 item { SummaryCard(coins = coins) }
@@ -292,15 +300,16 @@ private fun CoinLazyList(
                     isFavorite = favorites.contains(coin.id),
                     currency = currency,
                     onCoinClick = { onCoinClick(coin.id) },
-                    onFavoriteClick = { onFavoriteClick(coin.id) }
+                    onFavoriteClick = { onFavoriteClick(coin.id) },
                 )
             }
         }
         CoinScrollbar(
             listState = listState,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
+            modifier =
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight(),
         )
     }
 }
@@ -308,48 +317,50 @@ private fun CoinLazyList(
 @Preview(showBackground = true, name = "CoinList - Data")
 @Composable
 fun CoinListContentDataPreview() {
-    val dummyCoins = listOf(
-        Coin(
-            id = "bitcoin",
-            symbol = "btc",
-            name = "Bitcoin",
-            currentPrice = 70000.0,
-            priceChangePercentage24h = 4.61,
-            marketCap = 1380000000000.0,
-            totalVolume = 28000000000.0,
-            imageUrl = "",
-            marketCapRank = 1,
-            high24h = 71000.0,
-            low24h = 69000.0
-        ),
-        Coin(
-            id = "ethereum",
-            symbol = "eth",
-            name = "Ethereum",
-            currentPrice = 2066.49,
-            priceChangePercentage24h = -3.40,
-            marketCap = 248000000000.0,
-            totalVolume = 12000000000.0,
-            imageUrl = "",
-            marketCapRank = 2,
-            high24h = 2100.0,
-            low24h = 2000.0
+    val dummyCoins =
+        listOf(
+            Coin(
+                id = "bitcoin",
+                symbol = "btc",
+                name = "Bitcoin",
+                currentPrice = 70000.0,
+                priceChangePercentage24h = 4.61,
+                marketCap = 1380000000000.0,
+                totalVolume = 28000000000.0,
+                imageUrl = "",
+                marketCapRank = 1,
+                high24h = 71000.0,
+                low24h = 69000.0,
+            ),
+            Coin(
+                id = "ethereum",
+                symbol = "eth",
+                name = "Ethereum",
+                currentPrice = 2066.49,
+                priceChangePercentage24h = -3.40,
+                marketCap = 248000000000.0,
+                totalVolume = 12000000000.0,
+                imageUrl = "",
+                marketCapRank = 2,
+                high24h = 2100.0,
+                low24h = 2000.0,
+            ),
         )
-    )
 
     CoinPulseTheme {
         CoinListContent(
-            uiState = CoinUiState(
-                coins = dummyCoins,
-                favorites = setOf("bitcoin"),
-                lastUpdated = "15:00:00",
-                isRefreshEnabled = true
-            ),
+            uiState =
+                CoinUiState(
+                    coins = dummyCoins,
+                    favorites = setOf("bitcoin"),
+                    lastUpdated = "15:00:00",
+                    isRefreshEnabled = true,
+                ),
             onCoinClick = {},
             onFavoriteClick = {},
             onRefresh = {},
             onSearchQueryChange = {},
-            onSearchActiveChange = {}
+            onSearchActiveChange = {},
         )
     }
 }
@@ -357,35 +368,37 @@ fun CoinListContentDataPreview() {
 @Preview(showBackground = true, name = "CoinList - Search Active")
 @Composable
 fun CoinListContentSearchPreview() {
-    val dummyCoins = listOf(
-        Coin(
-            id = "bitcoin",
-            symbol = "btc",
-            name = "Bitcoin",
-            currentPrice = 70000.0,
-            priceChangePercentage24h = 4.61,
-            marketCap = 1380000000000.0,
-            totalVolume = 28000000000.0,
-            imageUrl = "",
-            marketCapRank = 1,
-            high24h = 71000.0,
-            low24h = 69000.0
+    val dummyCoins =
+        listOf(
+            Coin(
+                id = "bitcoin",
+                symbol = "btc",
+                name = "Bitcoin",
+                currentPrice = 70000.0,
+                priceChangePercentage24h = 4.61,
+                marketCap = 1380000000000.0,
+                totalVolume = 28000000000.0,
+                imageUrl = "",
+                marketCapRank = 1,
+                high24h = 71000.0,
+                low24h = 69000.0,
+            ),
         )
-    )
 
     CoinPulseTheme {
         CoinListContent(
-            uiState = CoinUiState(
-                coins = dummyCoins,
-                favorites = emptySet(),
-                isSearchActive = true,
-                searchQuery = "Bit"
-            ),
+            uiState =
+                CoinUiState(
+                    coins = dummyCoins,
+                    favorites = emptySet(),
+                    isSearchActive = true,
+                    searchQuery = "Bit",
+                ),
             onCoinClick = {},
             onFavoriteClick = {},
             onRefresh = {},
             onSearchQueryChange = {},
-            onSearchActiveChange = {}
+            onSearchActiveChange = {},
         )
     }
 }
@@ -400,7 +413,7 @@ fun CoinListContentLoadingPreview() {
             onFavoriteClick = {},
             onRefresh = {},
             onSearchQueryChange = {},
-            onSearchActiveChange = {}
+            onSearchActiveChange = {},
         )
     }
 }
@@ -415,7 +428,7 @@ fun CoinListContentErrorPreview() {
             onFavoriteClick = {},
             onRefresh = {},
             onSearchQueryChange = {},
-            onSearchActiveChange = {}
+            onSearchActiveChange = {},
         )
     }
 }

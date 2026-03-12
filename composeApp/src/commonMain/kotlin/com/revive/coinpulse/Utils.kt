@@ -16,17 +16,21 @@ fun getCurrentEpochMs(): Long = Clock.System.now().toEpochMilliseconds()
 fun formatEpochMs(epochMs: Long): String {
     val instant = Instant.fromEpochMilliseconds(epochMs)
     val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}:${local.second.toString().padStart(2, '0')}"
+    return "${local.hour.toString().padStart(
+        2,
+        '0',
+    )}:${local.minute.toString().padStart(2, '0')}:${local.second.toString().padStart(2, '0')}"
 }
 
-fun currencySymbol(currency: String): String = when (currency.lowercase()) {
-    "usd" -> "$"
-    "krw" -> "₩"
-    "eur" -> "€"
-    "jpy" -> "¥"
-    "btc" -> "₿"
-    else -> "$"
-}
+fun currencySymbol(currency: String): String =
+    when (currency.lowercase()) {
+        "usd" -> "$"
+        "krw" -> "₩"
+        "eur" -> "€"
+        "jpy" -> "¥"
+        "btc" -> "₿"
+        else -> "$"
+    }
 
 fun Double.toFormattedPrice(currency: String = "usd"): String {
     val symbol = currencySymbol(currency)
@@ -35,12 +39,13 @@ fun Double.toFormattedPrice(currency: String = "usd"): String {
     val decimalStr = decimal.toString().padStart(2, '0')
 
     val intStr = long.toString()
-    val withComma = buildString {
-        intStr.reversed().forEachIndexed { index, c ->
-            if (index > 0 && index % 3 == 0) append(',')
-            append(c)
-        }
-    }.reversed()
+    val withComma =
+        buildString {
+            intStr.reversed().forEachIndexed { index, c ->
+                if (index > 0 && index % 3 == 0) append(',')
+                append(c)
+            }
+        }.reversed()
 
     return "$symbol$withComma.$decimalStr"
 }

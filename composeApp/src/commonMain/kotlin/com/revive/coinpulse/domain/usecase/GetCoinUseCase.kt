@@ -7,6 +7,6 @@ class GetCoinsUseCase(private val repository: CoinRepository) {
     suspend operator fun invoke(
         currency: String = "usd",
         page: Int = 1,
-        perPage: Int = 100
+        perPage: Int = 100,
     ): Result<List<Coin>> = repository.getCoins(currency, page, perPage)
 }

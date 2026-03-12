@@ -7,7 +7,6 @@ import com.russhwolf.settings.Settings
 import kotlinx.serialization.json.Json
 
 class CoinCacheStorage(settings: Settings) {
-
     init {
         initCoinCacheSettings(settings)
     }
@@ -20,8 +19,11 @@ class CoinCacheStorage(settings: Settings) {
 
     fun loadCoins(): List<Coin> {
         val raw = loadCoinCache()
-        return if (raw.isEmpty()) emptyList()
-        else json.decodeFromString(raw)
+        return if (raw.isEmpty()) {
+            emptyList()
+        } else {
+            json.decodeFromString(raw)
+        }
     }
 
     fun hasCachedData(): Boolean = loadCoinCache().isNotEmpty()

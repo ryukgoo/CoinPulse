@@ -9,20 +9,20 @@ import kotlinx.coroutines.flow.StateFlow
 class CoinRepositoryImpl(
     private val remoteDataSource: CoinRemoteDataSource,
     private val favoriteStorage: FavoriteStorage,
-    private val cacheStorage: CoinCacheStorage
+    private val cacheStorage: CoinCacheStorage,
 ) : CoinRepository {
-
     override suspend fun getCoins(
         currency: String,
         page: Int,
-        perPage: Int
+        perPage: Int,
     ): Result<List<Coin>> {
         return try {
-            val coins = remoteDataSource.getCoins(
-                currency = currency,
-                page = page,
-                perPage = perPage
-            )
+            val coins =
+                remoteDataSource.getCoins(
+                    currency = currency,
+                    page = page,
+                    perPage = perPage,
+                )
             cacheStorage.saveCoins(coins)
             Result.success(coins)
         } catch (e: Exception) {
@@ -32,7 +32,7 @@ class CoinRepositoryImpl(
 
     override suspend fun getMarketChart(
         coinId: String,
-        currency: String
+        currency: String,
     ): Result<List<PricePoint>> {
         return try {
             val points = remoteDataSource.getMarketChart(coinId, currency)
@@ -43,10 +43,16 @@ class CoinRepositoryImpl(
     }
 
     override val favoritesFlow: StateFlow<Set<String>> = favoriteStorage.favoritesFlow
+
     override fun isFavorite(coinId: String): Boolean = favoriteStorage.isFavorite(coinId)
+
     override fun toggleFavorite(coinId: String) = favoriteStorage.toggleFavorite(coinId)
+
     override fun loadCachedCoins(): List<Coin> = cacheStorage.loadCoins()
+
     override fun hasCachedData(): Boolean = cacheStorage.hasCachedData()
+
     override fun getCacheTime(): String = cacheStorage.getCacheTime()
+
     override fun clearCache() = cacheStorage.clearCache()
 }

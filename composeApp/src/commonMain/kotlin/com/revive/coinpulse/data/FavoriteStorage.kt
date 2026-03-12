@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class FavoriteStorage(private val settings: Settings) {
-
     companion object {
         private const val KEY_FAVORITES = "favorites"
     }
@@ -20,8 +19,11 @@ class FavoriteStorage(private val settings: Settings) {
 
     fun toggleFavorite(coinId: String) {
         val current = getFavoriteIds().toMutableSet()
-        if (current.contains(coinId)) current.remove(coinId)
-        else current.add(coinId)
+        if (current.contains(coinId)) {
+            current.remove(coinId)
+        } else {
+            current.add(coinId)
+        }
         settings.putString(KEY_FAVORITES, current.joinToString(","))
         _favoritesFlow.value = current
     }

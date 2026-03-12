@@ -54,34 +54,35 @@ fun MobileNavigation(viewModel: CoinViewModel) {
                             icon = {
                                 Icon(
                                     imageVector = item.icon,
-                                    contentDescription = item.label
+                                    contentDescription = item.label,
                                 )
                             },
                             label = { Text(text = item.label) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = CoinPulseColors.Primary,
-                                selectedTextColor = CoinPulseColors.Primary,
-                                unselectedIconColor = CoinPulseColors.TextSecondary,
-                                unselectedTextColor = CoinPulseColors.TextSecondary,
-                                indicatorColor = CoinPulseColors.Background
-                            )
+                            colors =
+                                NavigationBarItemDefaults.colors(
+                                    selectedIconColor = CoinPulseColors.Primary,
+                                    selectedTextColor = CoinPulseColors.Primary,
+                                    unselectedIconColor = CoinPulseColors.TextSecondary,
+                                    unselectedTextColor = CoinPulseColors.TextSecondary,
+                                    indicatorColor = CoinPulseColors.Background,
+                                ),
                         )
                     }
                 }
             }
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             composable(BottomNavItem.Home.route) {
                 CoinListScreen(
                     viewModel = viewModel,
                     onCoinClick = { coinId ->
                         navController.navigate(CoinDetailRoute(coinId))
-                    }
+                    },
                 )
             }
             composable(BottomNavItem.Favorites.route) {
@@ -89,7 +90,7 @@ fun MobileNavigation(viewModel: CoinViewModel) {
                     viewModel = viewModel,
                     onCoinClick = { coinId ->
                         navController.navigate(CoinDetailRoute(coinId))
-                    }
+                    },
                 )
             }
             composable(BottomNavItem.Settings.route) {
@@ -104,7 +105,7 @@ fun MobileNavigation(viewModel: CoinViewModel) {
                     chartData = viewModel.uiState.value.chartData,
                     isChartLoading = viewModel.uiState.value.isChartLoading,
                     onLoadChart = { viewModel.loadChart(it) },
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
                 )
             }
         }

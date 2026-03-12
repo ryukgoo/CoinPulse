@@ -26,7 +26,7 @@ import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 @Composable
 fun AdaptiveNavigation(
     viewModel: CoinViewModel,
-    windowSizeClass: WindowSizeClass
+    windowSizeClass: WindowSizeClass,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val settingsUiState by viewModel.settingsUiState.collectAsState()
@@ -39,9 +39,10 @@ fun AdaptiveNavigation(
 
     Scaffold(containerColor = CoinPulseColors.Background) { innerPadding ->
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             // SideNavBar
             SideNavBar(
@@ -51,14 +52,15 @@ fun AdaptiveNavigation(
                     selectedCoinId = null
                 },
                 isExpanded = isSideNavExpanded,
-                onToggle = { isSideNavExpanded = !isSideNavExpanded }
+                onToggle = { isSideNavExpanded = !isSideNavExpanded },
             )
 
             // 마스터 영역
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
             ) {
                 // Medium일 때 디테일이 마스터를 덮음
                 if (!isExpanded && selectedCoinId != null) {
@@ -67,53 +69,58 @@ fun AdaptiveNavigation(
                         CoinDetailContent(
                             coin = coin,
                             currency = uiState.currency,
-                            onBackClick = { selectedCoinId = null }
+                            onBackClick = { selectedCoinId = null },
                         )
                         return@Box
                     }
                 }
 
                 when (selectedRoute) {
-                    BottomNavItem.Home.route -> CoinListContent(
-                        uiState = uiState,
-                        onCoinClick = { selectedCoinId = it },
-                        onFavoriteClick = { viewModel.toggleFavorite(it) },
-                        onRefresh = { viewModel.refresh() },
-                        onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
-                        onSearchActiveChange = { viewModel.onSearchActiveChange(it) }
-                    )
-                    BottomNavItem.Favorites.route -> CoinFavoriteContent(
-                        favoriteCoins = uiState.coins.filter { uiState.favorites.contains(it.id) },
-                        favorites = uiState.favorites,
-                        onCoinClick = { selectedCoinId = it },
-                        onFavoriteClick = { viewModel.toggleFavorite(it) }
-                    )
-                    BottomNavItem.Settings.route -> SettingsContent(
-                        settingsUiState = settingsUiState,
-                        onCurrencyChange = { viewModel.onCurrencyChange(it) },
-                        onRefreshIntervalChange = { viewModel.onRefreshIntervalChange(it) },
-                        onCoinCountChange = { viewModel.onCoinCountChange(it) },
-                        onThemeChange = { viewModel.onThemeChange(it) }
-                    )
+                    BottomNavItem.Home.route ->
+                        CoinListContent(
+                            uiState = uiState,
+                            onCoinClick = { selectedCoinId = it },
+                            onFavoriteClick = { viewModel.toggleFavorite(it) },
+                            onRefresh = { viewModel.refresh() },
+                            onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+                            onSearchActiveChange = { viewModel.onSearchActiveChange(it) },
+                        )
+                    BottomNavItem.Favorites.route ->
+                        CoinFavoriteContent(
+                            favoriteCoins = uiState.coins.filter { uiState.favorites.contains(it.id) },
+                            favorites = uiState.favorites,
+                            onCoinClick = { selectedCoinId = it },
+                            onFavoriteClick = { viewModel.toggleFavorite(it) },
+                        )
+                    BottomNavItem.Settings.route ->
+                        SettingsContent(
+                            settingsUiState = settingsUiState,
+                            onCurrencyChange = { viewModel.onCurrencyChange(it) },
+                            onRefreshIntervalChange = { viewModel.onRefreshIntervalChange(it) },
+                            onCoinCountChange = { viewModel.onCoinCountChange(it) },
+                            onThemeChange = { viewModel.onThemeChange(it) },
+                        )
                 }
             }
 
             // 디테일 영역 - Expanded에서만 표시
             if (isExpanded) {
                 Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxSize()
-                        .background(CoinPulseColors.Surface)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .background(CoinPulseColors.Surface),
                 ) {
-                    val coin = selectedCoinId?.let { id ->
-                        uiState.coins.find { it.id == id }
-                    }
+                    val coin =
+                        selectedCoinId?.let { id ->
+                            uiState.coins.find { it.id == id }
+                        }
                     if (coin != null) {
                         CoinDetailContent(
                             coin = coin,
                             currency = uiState.currency,
-                            onBackClick = { selectedCoinId = null }
+                            onBackClick = { selectedCoinId = null },
                         )
                     } else {
                         EmptyDetailPlaceholder()
@@ -128,11 +135,11 @@ fun AdaptiveNavigation(
 private fun EmptyDetailPlaceholder() {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         androidx.compose.material3.Text(
             text = "Select a coin to view details",
-            color = CoinPulseColors.TextSecondary
+            color = CoinPulseColors.TextSecondary,
         )
     }
 }

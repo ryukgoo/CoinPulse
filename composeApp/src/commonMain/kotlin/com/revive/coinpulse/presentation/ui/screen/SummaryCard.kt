@@ -25,45 +25,50 @@ fun SummaryCard(coins: List<Coin>) {
     val downCount = coins.size - upCount
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(CoinPulseColors.Surface)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceAround
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(CoinPulseColors.Surface)
+                .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
         SummaryItem(
             label = "Total",
             value = "${coins.size}",
-            color = Color.White
+            color = Color.White,
         )
         SummaryItem(
             label = "Up",
             value = "$upCount",
-            color = CoinPulseColors.PriceUp
+            color = CoinPulseColors.PriceUp,
         )
         SummaryItem(
             label = "Down",
             value = "$downCount",
-            color = CoinPulseColors.PriceDown
+            color = CoinPulseColors.PriceDown,
         )
     }
 }
 
 @Composable
-private fun SummaryItem(label: String, value: String, color: Color) {
+private fun SummaryItem(
+    label: String,
+    value: String,
+    color: Color,
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = value,
             color = color,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            fontSize = 20.sp,
         )
         Text(
             text = label,
             color = CoinPulseColors.TextSecondary,
-            fontSize = 12.sp
+            fontSize = 12.sp,
         )
     }
 }

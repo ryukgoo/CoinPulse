@@ -32,7 +32,7 @@ import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 @Composable
 fun CoinFavoriteScreen(
     viewModel: CoinViewModel,
-    onCoinClick: (String) -> Unit
+    onCoinClick: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val favoriteCoins = uiState.coins.filter { uiState.favorites.contains(it.id) }
@@ -41,7 +41,7 @@ fun CoinFavoriteScreen(
         favoriteCoins = favoriteCoins,
         favorites = uiState.favorites,
         onCoinClick = onCoinClick,
-        onFavoriteClick = { viewModel.toggleFavorite(it) }
+        onFavoriteClick = { viewModel.toggleFavorite(it) },
     )
 }
 
@@ -51,12 +51,13 @@ fun CoinFavoriteContent(
     favoriteCoins: List<Coin>,
     favorites: Set<String>,
     onCoinClick: (String) -> Unit,
-    onFavoriteClick: (String) -> Unit
+    onFavoriteClick: (String) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(CoinPulseColors.Background)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CoinPulseColors.Background),
     ) {
         TopAppBar(
             title = {
@@ -64,24 +65,25 @@ fun CoinFavoriteContent(
                     text = "Favorites",
                     color = CoinPulseColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp
+                    fontSize = 22.sp,
                 )
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = CoinPulseColors.Background
-            )
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = CoinPulseColors.Background,
+                ),
         )
 
         if (favoriteCoins.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = "No favorites yet.\nTap ⭐ to add coins!",
                     color = CoinPulseColors.TextSecondary,
                     fontSize = 16.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         } else {
@@ -89,25 +91,27 @@ fun CoinFavoriteContent(
             Box(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(favoriteCoins) { coin ->
                         CoinItem(
                             coin = coin,
                             isFavorite = favorites.contains(coin.id),
                             onCoinClick = { onCoinClick(coin.id) },
-                            onFavoriteClick = { onFavoriteClick(coin.id) }
+                            onFavoriteClick = { onFavoriteClick(coin.id) },
                         )
                     }
                 }
                 CoinScrollbar(
                     listState = listState,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxHeight()
+                    modifier =
+                        Modifier
+                            .align(Alignment.CenterEnd)
+                            .fillMaxHeight(),
                 )
             }
         }
@@ -117,41 +121,42 @@ fun CoinFavoriteContent(
 @Preview(showBackground = true, name = "CoinFavorite - Data")
 @Composable
 fun CoinFavoriteContentDataPreview() {
-    val dummyCoins = listOf(
-        Coin(
-            id = "bitcoin",
-            symbol = "btc",
-            name = "Bitcoin",
-            currentPrice = 70000.0,
-            priceChangePercentage24h = 4.61,
-            marketCap = 1380000000000.0,
-            totalVolume = 28000000000.0,
-            imageUrl = "",
-            marketCapRank = 1,
-            high24h = 71000.0,
-            low24h = 69000.0
-        ),
-        Coin(
-            id = "ethereum",
-            symbol = "eth",
-            name = "Ethereum",
-            currentPrice = 2066.49,
-            priceChangePercentage24h = -3.40,
-            marketCap = 248000000000.0,
-            totalVolume = 12000000000.0,
-            imageUrl = "",
-            marketCapRank = 2,
-            high24h = 2100.0,
-            low24h = 2000.0
+    val dummyCoins =
+        listOf(
+            Coin(
+                id = "bitcoin",
+                symbol = "btc",
+                name = "Bitcoin",
+                currentPrice = 70000.0,
+                priceChangePercentage24h = 4.61,
+                marketCap = 1380000000000.0,
+                totalVolume = 28000000000.0,
+                imageUrl = "",
+                marketCapRank = 1,
+                high24h = 71000.0,
+                low24h = 69000.0,
+            ),
+            Coin(
+                id = "ethereum",
+                symbol = "eth",
+                name = "Ethereum",
+                currentPrice = 2066.49,
+                priceChangePercentage24h = -3.40,
+                marketCap = 248000000000.0,
+                totalVolume = 12000000000.0,
+                imageUrl = "",
+                marketCapRank = 2,
+                high24h = 2100.0,
+                low24h = 2000.0,
+            ),
         )
-    )
 
     CoinPulseTheme {
         CoinFavoriteContent(
             favoriteCoins = dummyCoins,
             favorites = setOf("bitcoin", "ethereum"),
             onCoinClick = {},
-            onFavoriteClick = {}
+            onFavoriteClick = {},
         )
     }
 }
@@ -164,7 +169,7 @@ fun CoinFavoriteContentEmptyPreview() {
             favoriteCoins = emptyList(),
             favorites = emptySet(),
             onCoinClick = {},
-            onFavoriteClick = {}
+            onFavoriteClick = {},
         )
     }
 }
