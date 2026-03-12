@@ -51,7 +51,8 @@ fun CoinItem(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f)
         ) {
             AsyncImage(
                 model = coin.imageUrl,

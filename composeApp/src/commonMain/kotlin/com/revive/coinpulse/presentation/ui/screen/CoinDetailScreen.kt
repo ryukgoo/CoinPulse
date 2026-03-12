@@ -40,10 +40,12 @@ import com.revive.coinpulse.toFormattedPrice
 @Composable
 fun CoinDetailScreen(
     coin: Coin,
+    currency: String = "usd",
     onBackClick: () -> Unit
 ) {
     CoinDetailContent(
         coin = coin,
+        currency = currency,
         onBackClick = onBackClick
     )
 }
@@ -52,6 +54,7 @@ fun CoinDetailScreen(
 @Composable
 fun CoinDetailContent(
     coin: Coin,
+    currency: String = "usd",
     onBackClick: () -> Unit
 ) {
     val priceChange = coin.priceChangePercentage24h ?: 0.0
@@ -127,7 +130,7 @@ fun CoinDetailContent(
 
             Column {
                 Text(
-                    text = coin.currentPrice.toFormattedPrice(),
+                    text = coin.currentPrice.toFormattedPrice(currency),
                     color = CoinPulseColors.TextPrimary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 36.sp
@@ -149,13 +152,13 @@ fun CoinDetailContent(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                DetailRow(label = "Market Cap", value = coin.marketCap.toFormattedPrice())
+                DetailRow(label = "Market Cap", value = coin.marketCap.toFormattedPrice(currency))
                 HorizontalDivider(color = CoinPulseColors.Background)
-                DetailRow(label = "24h Volume", value = (coin.totalVolume ?: 0.0).toFormattedPrice())
+                DetailRow(label = "24h Volume", value = (coin.totalVolume ?: 0.0).toFormattedPrice(currency))
                 HorizontalDivider(color = CoinPulseColors.Background)
-                DetailRow(label = "24h High", value = coin.high24h?.toFormattedPrice() ?: "-")
+                DetailRow(label = "24h High", value = coin.high24h?.toFormattedPrice(currency) ?: "-")
                 HorizontalDivider(color = CoinPulseColors.Background)
-                DetailRow(label = "24h Low", value = coin.low24h?.toFormattedPrice() ?: "-")
+                DetailRow(label = "24h Low", value = coin.low24h?.toFormattedPrice(currency) ?: "-")
             }
         }
     }

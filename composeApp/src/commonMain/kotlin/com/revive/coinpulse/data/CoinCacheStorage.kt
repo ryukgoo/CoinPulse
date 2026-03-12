@@ -6,37 +6,30 @@ import com.revive.coinpulse.getCurrentEpochMs
 import com.russhwolf.settings.Settings
 import kotlinx.serialization.json.Json
 
-class CoinCacheStorage(private val settings: Settings) {
+class CoinCacheStorage(settings: Settings) {
 
-    companion object {
-        private const val KEY_COIN_CACHE = "coin_cache"
-        private const val KEY_CACHE_TIME = "cache_time"
+    init {
+        initCoinCacheSettings(settings)
     }
 
     private val json = Json { ignoreUnknownKeys = true }
 
     fun saveCoins(coins: List<Coin>) {
-        settings.putString(KEY_COIN_CACHE, json.encodeToString(coins))
-        settings.putLong(KEY_CACHE_TIME, getCurrentEpochMs())
+        saveCoinCache(json.encodeToString(coins), getCurrentEpochMs())
     }
 
     fun loadCoins(): List<Coin> {
-        val raw = settings.getString(KEY_COIN_CACHE, "")
+        val raw = loadCoinCache()
         return if (raw.isEmpty()) emptyList()
         else json.decodeFromString(raw)
     }
 
-    fun clearCache() {
-        settings.remove(KEY_COIN_CACHE)
-        settings.remove(KEY_CACHE_TIME)
-    }
-
-    fun hasCachedData(): Boolean {
-        return settings.getString(KEY_COIN_CACHE, "").isNotEmpty()
-    }
+    fun hasCachedData(): Boolean = loadCoinCache().isNotEmpty()
 
     fun getCacheTime(): String {
-        val epochMs = settings.getLong(KEY_CACHE_TIME, 0L)
+        val epochMs = loadCoinCacheTime()
         return if (epochMs == 0L) "" else formatEpochMs(epochMs)
     }
+
+    fun clearCache() = clearCoinCache()
 }
