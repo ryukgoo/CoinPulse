@@ -13,7 +13,6 @@ import com.revive.coinpulse.domain.usecase.GetCoinsUseCase
 import com.revive.coinpulse.domain.usecase.ObserveFavoritesUseCase
 import com.revive.coinpulse.domain.usecase.ToggleFavoriteUseCase
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
-import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -43,6 +42,6 @@ val appModule = module {
     single { AppSettings(get()) }
 
     // ViewModel
-    viewModel { CoinViewModel(get(), get(), get(), get(), get()) }
+    single { CoinViewModel(get(), get(), get(), get(), get()) }
 }
 

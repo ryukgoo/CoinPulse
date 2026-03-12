@@ -9,7 +9,7 @@ import com.revive.coinpulse.presentation.navigation.AppNavigation
 import com.revive.coinpulse.presentation.ui.theme.CoinPulseTheme
 import com.revive.coinpulse.presentation.viewmodel.CoinViewModel
 import org.koin.compose.KoinApplication
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 @Preview
@@ -17,7 +17,7 @@ fun App() {
     KoinApplication(application = {
         modules(appModule)
     }) {
-        val viewModel = koinViewModel<CoinViewModel>()
+        val viewModel = koinInject<CoinViewModel>()
         val settingsUiState by viewModel.settingsUiState.collectAsState()
 
         CoinPulseTheme(appTheme = settingsUiState.theme) {
