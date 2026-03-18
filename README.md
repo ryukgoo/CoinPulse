@@ -1,76 +1,165 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM).
+# CoinPulse 🪙
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+A Kotlin Multiplatform cryptocurrency monitoring app built with Compose Multiplatform.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Platforms
 
-### Build and Run Android Application
+| Platform | Status |
+|----------|--------|
+| Android | ✅ |
+| iOS | ✅ |
+| Desktop (JVM) | ✅ |
+| Web (WasmJS) | ✅ |
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+## Features
 
-### Build and Run Desktop (JVM) Application
+- 📊 Real-time cryptocurrency prices via CoinGecko API
+- 📈 7-day price chart with gradient visualization
+- ⭐ Favorites management with persistent storage
+- 🔍 Real-time search
+- 🌙 Light / Dark / System theme
+- 💱 Multi-currency support (USD, KRW, EUR, JPY, BTC)
+- 🔄 Auto-refresh with configurable intervals
+- 💾 Platform-specific caching
+- 📱 Responsive UI (Mobile / Tablet / Desktop)
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+## Tech Stack
 
-### Build and Run Web Application
+### Core
+- [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html)
+- [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)
+- [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+### Networking
+- [Ktor](https://ktor.io/) - HTTP client
+- [Kotlinx Serialization](https://github.com/Kotlin/kotlinx.serialization) - JSON parsing
 
-### Build and Run iOS Application
+### DI
+- [Koin](https://insert-koin.io/) - Dependency injection
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+### Storage
+- [Multiplatform Settings](https://github.com/russhwolf/multiplatform-settings) - Key-value storage
+- File-based cache for JVM
 
----
+### Image Loading
+- [Coil](https://coil-kt.github.io/coil/) - Async image loading
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+### Navigation
+- [Navigation Compose](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-navigation-routing.html)
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+### Code Quality
+- [Detekt](https://detekt.dev/) - Static analysis
+- [Ktlint](https://ktlint.github.io/) - Code formatting
+
+## Architecture
+
+```
+commonMain/
+├── data/
+│   ├── model/          # Coin, ChartData, PricePoint
+│   ├── remote/         # CoinGeckoApi, CoinRemoteDataSource
+│   ├── AppSettings.kt
+│   ├── CoinCacheStorage.kt
+│   ├── CoinRepositoryImpl.kt
+│   └── FavoriteStorage.kt
+├── domain/
+│   ├── repository/     # CoinRepository
+│   └── usecase/        # GetCoinsUseCase, GetMarketChartUseCase, ...
+├── di/
+│   └── AppModule.kt
+└── presentation/
+    ├── navigation/     # MobileNavigation, AdaptiveNavigation
+    ├── ui/
+    │   ├── component/  # SideNavBar
+    │   ├── screen/     # CoinListScreen, CoinDetailScreen, ...
+    │   └── theme/      # CoinPulseTheme
+    └── viewmodel/      # CoinViewModel
+```
+
+## Responsive Layout
+
+| Screen Width | Layout |
+|-------------|--------|
+| < 600dp | Mobile (BottomNavBar) |
+| 600 ~ 960dp | Medium (SideNavBar + Master) |
+| > 960dp | Expanded (SideNavBar + Master + Detail) |
+
+## CI/CD
+
+GitHub Actions를 통한 자동화된 CI 파이프라인:
+
+- **Lint** - Detekt + Ktlint
+- **Build Android** - Debug APK
+- **Build Desktop** - JVM Jar
+- **Build Web** - WasmJS Distribution
+- **Build iOS** - iOS Framework (main branch only)
+- **Unit Tests** - All platform tests
+
+## Getting Started
+
+### Requirements
+
+- Android Studio Ladybug or later
+- JDK 17
+- Xcode 15+ (iOS only)
+
+### Run
+
+```bash
+# Android
+./gradlew :composeApp:assembleDebug
+
+# Desktop
+./gradlew :composeApp:run
+
+# Web
+./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+
+# iOS
+# Open iosApp/iosApp.xcodeproj in Xcode
+```
+
+### Lint
+
+```bash
+# Check
+./gradlew detekt ktlintCheck
+
+# Auto fix
+./gradlew detektAutoCorrect ktlintFormat
+```
+
+## API
+
+This app uses the [CoinGecko API](https://www.coingecko.com/en/api) (free tier, no API key required).
+
+| Endpoint | Usage |
+|----------|-------|
+| `/coins/markets` | Coin list with prices |
+| `/coins/{id}/market_chart` | 7-day price history |
+
+## License
+
+```
+MIT License
+
+Copyright (c) 2024 CoinPulse
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
